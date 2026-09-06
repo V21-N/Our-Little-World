@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/api/client";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -17,33 +18,41 @@ export default function LoginPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { data, error } = await authClient.signIn.email({ email, password });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message ?? "Login failed");
-      return;
+    try {
+      const { error } = await authClient.signIn.email({ email, password });
+      if (error) {
+        toast.error(error.message ?? "Login failed");
+        return;
+      }
+      toast.success("Selamat datang kembali");
+
+      const params = new URLSearchParams(window.location.search);
+      const explicitNext = params.get("next");
+      const invite = params.get("invite");
+
+      if (explicitNext && explicitNext.startsWith("/")) {
+        window.location.href = explicitNext;
+        return;
+      }
+
+      const coupleRes = await apiFetch("/api/couples/current");
+      if (!coupleRes.success) {
+        toast.error(coupleRes.error);
+        return;
+      }
+      const hasCouple = Boolean(coupleRes.data);
+
+      if (invite) {
+        window.location.href = hasCouple ? "/dashboard" : `/join/${encodeURIComponent(invite)}`;
+        return;
+      }
+
+      window.location.href = hasCouple ? "/dashboard" : "/onboarding/create-couple";
+    } catch {
+      toast.error("Tidak dapat terhubung ke server. Coba lagi.");
+    } finally {
+      setLoading(false);
     }
-    toast.success("Selamat datang kembali");
-
-    const params = new URLSearchParams(window.location.search);
-    const explicitNext = params.get("next");
-    const invite = params.get("invite");
-
-    if (explicitNext && explicitNext.startsWith("/")) {
-      window.location.href = explicitNext;
-      return;
-    }
-
-    const coupleRes = await fetch("/api/couples/current", { credentials: "include" });
-    const coupleJson = await coupleRes.json().catch(() => null);
-    const hasCouple = coupleJson?.success && coupleJson.data;
-
-    if (invite) {
-      window.location.href = hasCouple ? "/dashboard" : `/join/${encodeURIComponent(invite)}`;
-      return;
-    }
-
-    window.location.href = hasCouple ? "/dashboard" : "/onboarding/create-couple";
   };
 
   return (

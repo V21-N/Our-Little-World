@@ -11,6 +11,7 @@ export function RequireCouple({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const isOnboarding = pathname.startsWith("/onboarding");
+  const isSettings = pathname === "/settings" || pathname.startsWith("/settings/");
 
   useEffect(() => {
     if (loading) return;
@@ -19,14 +20,14 @@ export function RequireCouple({ children }: { children: React.ReactNode }) {
       router.replace(`/login${next}`);
       return;
     }
-    if (!couple && !isOnboarding) {
+    if (!couple && !isOnboarding && !isSettings) {
       router.replace("/onboarding/create-couple");
       return;
     }
     if (couple && isOnboarding) {
       router.replace("/dashboard");
     }
-  }, [loading, user, couple, router, pathname, isOnboarding]);
+  }, [loading, user, couple, router, pathname, isOnboarding, isSettings]);
 
   if (loading || !user) {
     return (
@@ -36,7 +37,7 @@ export function RequireCouple({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!couple && !isOnboarding) return null;
+  if (!couple && !isOnboarding && !isSettings) return null;
   if (couple && isOnboarding) return null;
 
   return <>{children}</>;

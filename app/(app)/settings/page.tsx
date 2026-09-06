@@ -49,6 +49,11 @@ export default function SettingsPage() {
   const [savingCouple, setSavingCouple] = useState(false);
   const [leaving, setLeaving] = useState(false);
 
+  const logout = async () => {
+    await signOut();
+    router.replace("/");
+  };
+
   const [profileForm, setProfileForm] = useState({
     fullName: "",
     nickname: "",
@@ -81,10 +86,29 @@ export default function SettingsPage() {
     }
   }, [couple]);
 
-  if (!user || !couple || !profile) {
+  if (!user || !profile) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!couple) {
+    return (
+      <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 text-center">
+        <SettingsIcon className="h-8 w-8 text-primary" />
+        <h1 className="mt-4 font-serif text-3xl tracking-tight">Pengaturan akun</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Kamu belum bergabung dengan couple. Buat atau terima undangan terlebih dahulu.
+        </p>
+        <div className="mt-6 flex gap-3">
+          <Button variant="outline" onClick={() => router.push("/")}>Beranda</Button>
+          <Button onClick={logout}>
+            <LogOut className="h-4 w-4" />
+            Keluar
+          </Button>
+        </div>
       </div>
     );
   }
@@ -394,10 +418,7 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               className="w-full justify-between"
-              onClick={async () => {
-                await signOut();
-                router.push("/login");
-              }}
+              onClick={logout}
             >
               <span>Keluar</span>
               <LogOut className="h-4 w-4" />
@@ -447,8 +468,7 @@ export default function SettingsPage() {
             <Button
               variant="destructive"
               onClick={async () => {
-                await signOut();
-                router.push("/login");
+                await logout();
               }}
             >
               Hapus akun

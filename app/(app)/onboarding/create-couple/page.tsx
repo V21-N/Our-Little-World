@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Heart, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Heart, Loader2, LogOut, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ import { useAuth } from "@/lib/hooks/use-auth";
 
 export default function CreateCouplePage() {
   const router = useRouter();
-  const { couple, loading } = useAuth();
+  const { couple, loading, signOut } = useAuth();
   const [bootLoading, setBootLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [step, setStep] = useState(1);
@@ -43,6 +43,11 @@ export default function CreateCouplePage() {
     } else {
       handleCreate();
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    router.replace("/");
   };
 
   const handleCreate = async () => {
@@ -83,8 +88,14 @@ export default function CreateCouplePage() {
             </span>
             Our Little World
           </div>
-          <div className="text-xs text-muted-foreground">
-            Langkah {step} dari 2
+          <div className="flex items-center gap-3">
+            <div className="text-xs text-muted-foreground">
+              Langkah {step} dari 2
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="h-3.5 w-3.5" />
+              Keluar
+            </Button>
           </div>
         </div>
 
@@ -191,6 +202,12 @@ export default function CreateCouplePage() {
                 <Heart className="h-4 w-4" fill="currentColor" />
               </>
             )}
+          </Button>
+        </div>
+        <div className="mt-6 border-t border-border pt-6 text-center">
+          <p className="text-sm text-muted-foreground">Sudah menerima undangan?</p>
+          <Button variant="link" onClick={() => router.push("/join")}>
+            Gabung dengan kode undangan
           </Button>
         </div>
       </div>

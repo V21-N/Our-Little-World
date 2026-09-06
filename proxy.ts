@@ -73,7 +73,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isLoggedIn) {
-    if (pathname === "/" || authOnly) {
+    if (authOnly) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

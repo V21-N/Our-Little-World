@@ -1,8 +1,8 @@
 # Our Little World ❤️
 
-> _Tempat privat kita berdua._ — A private web space for two.
+> _Tempat privat kita berdua._ A private web space for two.
 
-A small, intimate app where one couple can keep their memories, letters, mood, bucket list, and future plans together — nothing public, no feeds, no algorithms. Just the two of you.
+A small, intimate app where one couple can keep their memories, letters, mood, bucket list, and future plans together nothing public, no feeds, no algorithms. Just the two of you.
 
 ---
 
@@ -21,7 +21,7 @@ A small, intimate app where one couple can keep their memories, letters, mood, b
 | 🌱 **Future Us** | Dreams, goals, and time-capsule letters for a future date |
 | 🏆 **Achievements** | Auto-unlocked badges based on activity (days together, memory count, etc.) |
 
-All data is scoped to your couple — no other account can ever read it.
+All data is scoped to your couple no other account can ever read it.
 
 ---
 
@@ -192,17 +192,17 @@ Any Node.js host works. Recommended:
 3. Run `npm run db:push` (or apply migrations).
 4. Deploy: `npm run build && npm start`.
 
-Make sure `BETTER_AUTH_SECRET` is stable across deploys — rotating it invalidates all sessions.
+Make sure `BETTER_AUTH_SECRET` is stable across deploys rotating it invalidates all sessions.
 
 ---
 
 ## 📍 Where to look next
 
-- [PRD_Our_Little_World.md](./PRD_Our_Little_World.md) — full product spec, schema rationale, roadmap
-- `lib/db/schema/*.ts` — domain tables, one file per module
-- `app/api/couples/join/route.ts` — invite-code flow (case-insensitive, pre-validated via `/api/couples/by-invite/[code]`)
-- `proxy.ts` — auth gate (replaces the deprecated `middleware.ts` in Next 16)
-- `lib/services/achievements.ts` — trigger evaluation logic
+- [PRD_Our_Little_World.md](./PRD_Our_Little_World.md) full product spec, schema rationale, roadmap
+- `lib/db/schema/*.ts` domain tables, one file per module
+- `app/api/couples/join/route.ts` invite-code flow (case-insensitive, pre-validated via `/api/couples/by-invite/[code]`)
+- `proxy.ts` auth gate (replaces the deprecated `middleware.ts` in Next 16)
+- `lib/services/achievements.ts` trigger evaluation logic
 
 ---
 
