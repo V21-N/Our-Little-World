@@ -4,10 +4,13 @@ import { db } from "./db";
 import { profiles } from "./db/schema";
 import * as schema from "./db/schema";
 
-const configuredSiteURL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+const configuredSiteURL = (
+  process.env.BETTER_AUTH_URL ||
+  process.env.SITE_URL ||
+  process.env.NEXT_PUBLIC_SITE_URL
+)?.replace(/\/$/, "");
 const vercelURL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
 const authBaseURL =
-  process.env.BETTER_AUTH_URL?.replace(/\/$/, "") ||
   (vercelURL && configuredSiteURL?.startsWith("http://localhost")
     ? vercelURL
     : configuredSiteURL || vercelURL || "http://localhost:3000");
