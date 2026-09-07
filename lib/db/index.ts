@@ -12,7 +12,7 @@ const client = postgres(connectionString, {
   idle_timeout: 20,
   connect_timeout: 10,
   prepare: false,
-  ...(connectionString.includes("supabase.co") ? { ssl: "require" as const } : {}),
+  ...(connectionString.includes("supabase.com") ? { ssl: "require" as const } : {}),
 });
 
 export const db = drizzle(client, { schema });

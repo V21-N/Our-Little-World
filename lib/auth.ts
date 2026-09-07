@@ -4,14 +4,22 @@ import { db } from "./db";
 import { profiles } from "./db/schema";
 import * as schema from "./db/schema";
 
+const configuredSiteURL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+const vercelURL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
 const authBaseURL =
-  process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  process.env.BETTER_AUTH_URL?.replace(/\/$/, "") ||
+  (vercelURL && configuredSiteURL?.startsWith("http://localhost")
+    ? vercelURL
+    : configuredSiteURL || vercelURL || "http://localhost:3000");
 
 const trustedOrigins = [
   authBaseURL,
-  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+  configuredSiteURL,
+  vercelURL,
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
   "https://our-little-world-blond.vercel.app",
-].filter((origin): origin is string => Boolean(origin));
+].filter((origin, index, origins): origin is string => Boolean(origin) && origins.indexOf(origin) === index);
 
 export const auth = betterAuth({
   baseURL: authBaseURL,

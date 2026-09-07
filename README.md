@@ -187,7 +187,7 @@ scripts/                     # seed scripts (achievements)
 
 Any Node.js host works. Recommended:
 
-1. Provision Postgres (Supabase, Neon, or a managed instance).
+1. Provision Postgres (Supabase, Neon, or a managed instance). For Supabase, use the IPv4-compatible pooler connection string from **Connect** for `DATABASE_URL`; the direct `db.<project-ref>.supabase.co` endpoint may be IPv6-only and unreachable from some local/Vercel runtimes.
 2. Set the env vars (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `NEXT_PUBLIC_SITE_URL` with the production URL).
 3. Run `npm run db:push` (or apply migrations).
 4. Deploy: `npm run build && npm start`.
