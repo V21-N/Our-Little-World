@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api/client";
 
@@ -28,7 +28,18 @@ export interface CurrentProfile {
   avatarUrl: string | null;
 }
 
-export function useAuth() {
+type AuthContextValue = {
+  user: CurrentUser | null;
+  profile: CurrentProfile | null;
+  couple: CurrentCouple | null;
+  loading: boolean;
+  refresh: () => Promise<void>;
+  signOut: () => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+function useAuthState(): AuthContextValue {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [profile, setProfile] = useState<CurrentProfile | null>(null);
   const [couple, setCouple] = useState<CurrentCouple | null>(null);
@@ -69,4 +80,15 @@ export function useAuth() {
   }, []);
 
   return { user, profile, couple, loading, refresh, signOut };
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const value = useAuthState();
+  return createElement(AuthContext.Provider, { value }, children);
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used inside AuthProvider");
+  return context;
 }

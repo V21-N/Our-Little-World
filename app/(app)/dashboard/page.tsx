@@ -65,25 +65,28 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const load = async () => {
-      const memoriesRes = await apiFetch<{ items: Memory[] }>("/api/memories?limit=4");
-      const lettersRes = await apiFetch<LoveLetter[]>("/api/letters");
-      const bucketRes = await apiFetch<{
-        items: any[];
-        progress: number;
-        total: number;
-        completed: number;
-      }>("/api/bucket-list");
-      const moodRes = await apiFetch<{
-        myToday: DailyMood | null;
-        partnerToday: DailyMood | null;
-        history: DailyMood[];
-      }>("/api/mood");
-      const timelineRes = await apiFetch<TimelineEvent[]>("/api/timeline");
-      const achievementRes = await apiFetch<{
-        all: Achievement[];
-        unlocked: Achievement[];
-        unlockedCount: number;
-      }>("/api/achievements");
+      const [memoriesRes, lettersRes, bucketRes, moodRes, timelineRes, achievementRes] =
+        await Promise.all([
+          apiFetch<{ items: Memory[] }>("/api/memories?limit=4"),
+          apiFetch<LoveLetter[]>("/api/letters"),
+          apiFetch<{
+            items: unknown[];
+            progress: number;
+            total: number;
+            completed: number;
+          }>("/api/bucket-list"),
+          apiFetch<{
+            myToday: DailyMood | null;
+            partnerToday: DailyMood | null;
+            history: DailyMood[];
+          }>("/api/mood"),
+          apiFetch<TimelineEvent[]>("/api/timeline"),
+          apiFetch<{
+            all: Achievement[];
+            unlocked: Achievement[];
+            unlockedCount: number;
+          }>("/api/achievements"),
+        ]);
 
       const todayStr = new Date().toISOString().split("T")[0];
       let myToday: DailyMood | null = null;
