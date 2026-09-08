@@ -43,8 +43,6 @@ export default function NewMemoryPage() {
     photos: [] as Photo[],
   });
 
-  const previews = form.photos.map((p) => p.url);
-
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (!couple) return;
@@ -153,7 +151,7 @@ export default function NewMemoryPage() {
                     )}
                     <input
                       type="file"
-                      accept="image/jpeg,image/png,image/webp"
+                      accept="image/*,.heic,.heif"
                       multiple
                       className="hidden"
                       onChange={onFileChange}
@@ -163,7 +161,7 @@ export default function NewMemoryPage() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                Format: JPG, PNG, WebP · Maks 8MB per foto
+                Semua format foto · Otomatis dikompres jika lebih dari 8MB
               </p>
             </div>
           </CardContent>

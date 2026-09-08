@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import {
-  Check,
   HelpCircle,
   Loader2,
   Plus,
@@ -23,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
@@ -35,9 +34,24 @@ interface PlayQuestion {
   options: string[];
 }
 
+interface HistoryAnswer {
+  id: string;
+  questionId: string;
+  selectedOptionIndex: number;
+  isCorrect: boolean;
+  answeredAt: string;
+  question: { questionText: string; options: string[] } | null;
+}
+
+interface HistorySession extends Omit<QuizSession, "answers"> {
+  player?: { id: string; fullName: string; nickname: string | null };
+  answers?: HistoryAnswer[];
+}
+
 export default function QuizPage() {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [sessions, setSessions] = useState<QuizSession[]>([]);
+  const [sessions, setSessions] = useState<HistorySession[]>([]);
+  const [detailSession, setDetailSession] = useState<HistorySession | null>(null);
   const [loading, setLoading] = useState(true);
   const [openAdd, setOpenAdd] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -314,17 +328,11 @@ export default function QuizPage() {
                             {q.options.map((opt, optI) => (
                               <li
                                 key={opt}
-                                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
-                                  optI === q.correctOptionIndex
-                                    ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                                    : "border-border/60 bg-card text-foreground/70"
-                                }`}
+                                className="flex items-center gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 text-sm text-foreground/70"
                               >
-                                {optI === q.correctOptionIndex ? (
-                                  <Check className="h-3.5 w-3.5" />
-                                ) : (
-                                  <span className="h-3.5 w-3.5" />
-                                )}
+                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px]">
+                                  {String.fromCharCode(65 + optI)}
+                                </span>
                                 <span>{opt}</span>
                               </li>
                             ))}
@@ -342,7 +350,7 @@ export default function QuizPage() {
             <h2 className="mb-3 font-serif text-xl">Histori Sesi</h2>
             <ul className="space-y-2">
               {sessions.map((session) => {
-                const total = questions.length;
+                const total = session.answers?.length ?? 0;
                 const correct = session.score ?? 0;
                 const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
                 return (
@@ -359,15 +367,17 @@ export default function QuizPage() {
                               : session.status}
                           </p>
                           <p className="text-xs text-muted-foreground">
+                            {session.player?.nickname || session.player?.fullName || "Pemain"} · {session.status === "completed" ? "Selesai" : "Sedang berlangsung"} ·{" "}
                             {formatDate(session.startedAt, {
                               day: "numeric",
                               month: "long",
                               year: "numeric",
-                            })}{" "}
-                            · {pct}%
+                            })} · {pct}%
                           </p>
                         </div>
-                        <Badge variant={pct >= 70 ? "success" : "soft"}>{pct}%</Badge>
+                        <Button variant="outline" size="sm" onClick={() => setDetailSession(session)}>
+                          Detail
+                        </Button>
                       </CardContent>
                     </Card>
                   </li>
@@ -377,6 +387,57 @@ export default function QuizPage() {
           </section>
         </>
       )}
+
+      <Dialog open={Boolean(detailSession)} onOpenChange={(open) => !open && setDetailSession(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detail sesi kuis</DialogTitle>
+          </DialogHeader>
+          {detailSession && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <p className="text-xs text-muted-foreground">Pemain</p>
+                  <p className="mt-1 font-medium">
+                    {detailSession.player?.nickname || detailSession.player?.fullName || "Pemain"}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <p className="text-xs text-muted-foreground">Skor</p>
+                  <p className="mt-1 font-medium">
+                    {detailSession.score ?? 0}/{detailSession.answers?.length ?? 0}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <p className="text-xs text-muted-foreground">Dimulai</p>
+                  <p className="mt-1 font-medium">{formatDate(detailSession.startedAt, { dateStyle: "medium", timeStyle: "short" })}</p>
+                </div>
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <p className="text-xs text-muted-foreground">Selesai</p>
+                  <p className="mt-1 font-medium">
+                    {detailSession.completedAt
+                      ? formatDate(detailSession.completedAt, { dateStyle: "medium", timeStyle: "short" })
+                      : "Belum selesai"}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {detailSession.answers?.map((answer, index) => (
+                  <div key={answer.id} className="rounded-xl border border-border/60 p-3 text-sm">
+                    <p className="font-medium">{index + 1}. {answer.question?.questionText ?? "Pertanyaan"}</p>
+                    <p className={answer.isCorrect ? "mt-1 text-emerald-700" : "mt-1 text-rose-700"}>
+                      Jawaban: {answer.question?.options[answer.selectedOptionIndex] ?? "Tidak tersedia"} {answer.isCorrect ? "✓ Benar" : "✕ Salah"}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Dijawab {formatDate(answer.answeredAt, { dateStyle: "medium", timeStyle: "short" })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Add Question Dialog */}
       <Dialog open={openAdd} onOpenChange={setOpenAdd}>

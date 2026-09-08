@@ -23,8 +23,9 @@ export function AppSidebar() {
         className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-primary/8 to-transparent"
       />
       <div className="relative flex items-center gap-2 px-6 py-6 font-serif text-lg font-semibold">
-        <span className="heartbeat flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary/15 text-sidebar-primary">
-          <Heart className="h-4 w-4" fill="currentColor" />
+        <span className="heartbeat flex h-8 w-8 overflow-hidden rounded-full bg-sidebar-primary/15">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.webp" alt="Our Little World" className="h-full w-full object-cover" />
         </span>
         Our Little World
       </div>

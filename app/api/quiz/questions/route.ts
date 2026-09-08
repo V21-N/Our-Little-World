@@ -13,7 +13,18 @@ const createSchema = z.object({
 export async function GET(request: Request) {
   try {
     const { couple } = await requireCoupleMembership(request);
-    const questions = await db.select().from(quizQuestions).where(eq(quizQuestions.coupleId, couple.id)).orderBy(desc(quizQuestions.createdAt));
+    const questions = await db
+      .select({
+        id: quizQuestions.id,
+        coupleId: quizQuestions.coupleId,
+        createdBy: quizQuestions.createdBy,
+        questionText: quizQuestions.questionText,
+        options: quizQuestions.options,
+        createdAt: quizQuestions.createdAt,
+      })
+      .from(quizQuestions)
+      .where(eq(quizQuestions.coupleId, couple.id))
+      .orderBy(desc(quizQuestions.createdAt));
     return ok(questions);
   } catch (e) {
     return handleError(e);

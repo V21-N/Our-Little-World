@@ -38,14 +38,12 @@ export const MOODS = [
 
 export const OPEN_WHEN_TAGS = [
   { value: "when_you_miss_me", label: "When you miss me" },
-  { value: "when_you_feel_down", label: "When you feel down" },
-  { value: "when_you_need_motivation", label: "When you need motivation" },
-  { value: "when_we_celebrate", label: "When we celebrate" },
-  { value: "when_youre_stressed", label: "When you're stressed" },
-  { value: "when_you_want_to_laugh", label: "When you want to laugh" },
-  { value: "anniversary", label: "Anniversary" },
-  { value: "good_morning", label: "Good morning" },
-  { value: "good_night", label: "Good night" },
+  { value: "when_you_are_sad", label: "When you are sad" },
+  { value: "when_you_are_happy", label: "When you are happy" },
+  { value: "when_we_fight", label: "When we fight" },
+  { value: "when_you_need_a_reminder", label: "When you need a reminder" },
+  { value: "when_its_raining", label: "When it's raining" },
+  { value: "when_you_cant_sleep", label: "When you can't sleep" },
 ] as const;
 
 export const TIMELINE_PRESETS = [

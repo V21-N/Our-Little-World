@@ -68,8 +68,9 @@ export default function Home() {
 
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Link href="/" className="flex items-center gap-2 text-lg font-serif font-semibold">
-          <span className="heartbeat flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <Heart className="h-4 w-4" fill="currentColor" />
+          <span className="heartbeat flex h-8 w-8 overflow-hidden rounded-full bg-primary/15">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.webp" alt="Our Little World" className="h-full w-full object-cover" />
           </span>
           Our Little World
         </Link>

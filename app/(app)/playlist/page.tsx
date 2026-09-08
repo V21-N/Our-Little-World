@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ExternalLink, Loader2, Music, Plus, Trash2 } from "lucide-react";
+import { ExternalLink, Loader2, Music, Play, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,9 +16,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
-import { timeAgo } from "@/lib/utils";
 import { toast } from "sonner";
 import type { PlaylistItem } from "@/lib/types";
+import { isYouTubeUrl } from "@/lib/youtube";
+import { useYouTubePlayer } from "@/components/youtube-player-provider";
 
 const extractProvider = (url: string) => {
   if (url.includes("spotify.com") || url.includes("open.spotify")) return "Spotify";
@@ -38,6 +39,7 @@ export default function PlaylistPage() {
   const [loading, setLoading] = useState(true);
   const [openAdd, setOpenAdd] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { track: activeTrack, setQueue } = useYouTubePlayer();
   const [form, setForm] = useState({ songTitle: "", artist: "", url: "" });
 
   const reload = () => {
@@ -88,6 +90,14 @@ export default function PlaylistPage() {
       toast.error(json.error);
     }
   };
+
+  const youtubeTracks = playlist
+    .filter((item) => isYouTubeUrl(item.url))
+    .map((item) => ({
+      title: item.songTitle,
+      artist: item.artist ?? undefined,
+      url: item.url,
+    }));
 
   if (loading) {
     return (
@@ -180,43 +190,58 @@ export default function PlaylistPage() {
           }
         />
       ) : (
-        <ul className="space-y-2">
-          {playlist.map((item, i) => (
-            <li key={item.id}>
-              <Card className="group border-border/60 transition hover:border-primary/30">
-                <CardContent className="flex items-center gap-3 p-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-secondary/40 text-sm font-serif font-semibold text-primary">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{item.songTitle}</p>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {item.artist ?? "Tanpa artis"}
-                    </p>
-                  </div>
-                  <Badge className={`hidden sm:inline-flex ${extractProviderColor(item.url)}`}>
-                    {extractProvider(item.url)}
-                  </Badge>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon-sm" asChild>
-                      <a href={item.url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label="Hapus"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-2">
+            {playlist.map((item, i) => (
+              <li key={item.id}>
+                <Card className="group border-border/60 transition hover:border-primary/30">
+                  <CardContent className="flex items-center gap-3 p-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-secondary/40 text-sm font-serif font-semibold text-primary">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{item.songTitle}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {item.artist ?? "Tanpa artis"}
+                      </p>
+                    </div>
+                    <Badge className={`hidden sm:inline-flex ${extractProviderColor(item.url)}`}>
+                      {extractProvider(item.url)}
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                      {isYouTubeUrl(item.url) && (
+                        <Button
+                          variant={activeTrack?.url === item.url ? "default" : "ghost"}
+                          size="icon-sm"
+                          aria-label={`Putar ${item.songTitle}`}
+                          onClick={() => {
+                            const index = youtubeTracks.findIndex((track) => track.url === item.url);
+                            setQueue(youtubeTracks, index);
+                          }}
+                        >
+                          <Play className="h-4 w-4" fill="currentColor" />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="icon-sm" asChild>
+                        <a href={item.url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label="Hapus"
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

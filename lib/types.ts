@@ -136,7 +136,7 @@ export interface QuizQuestion {
   createdBy: string;
   questionText: string;
   options: string[];
-  correctOptionIndex: number;
+  correctOptionIndex?: number;
   createdAt: string;
 }
 

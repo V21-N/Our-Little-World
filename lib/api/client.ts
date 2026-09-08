@@ -1,5 +1,7 @@
 "use client";
 
+import { prepareImageUpload } from "@/lib/image-upload";
+
 export type ApiOk<T> = { success: true; data: T };
 export type ApiErr = { success: false; error: string; code?: string };
 
@@ -35,8 +37,15 @@ export async function uploadFile(
   entity: string,
   scopeId: string
 ): Promise<{ success: boolean; url?: string; path?: string; error?: string }> {
+  let preparedFile: File;
+  try {
+    preparedFile = await prepareImageUpload(file);
+  } catch {
+    return { success: false, error: "Format foto tidak dapat diproses" };
+  }
+
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("file", preparedFile);
   formData.append("entity", entity);
   formData.append("scopeId", scopeId);
 
@@ -45,16 +54,20 @@ export async function uploadFile(
     body: formData,
   });
 
-  let body: any = null;
+  let body: unknown = null;
   try {
     body = await res.json();
   } catch {
     return { success: false, error: "Upload failed" };
   }
 
-  if (!res.ok || body.success !== true) {
-    return { success: false, error: body.error ?? "Upload failed" };
+  if (!res.ok || (body as { success?: boolean }).success !== true) {
+    return {
+      success: false,
+      error: (body as { error?: string }).error ?? "Upload failed",
+    };
   }
 
-  return { success: true, url: body.data.url, path: body.data.path };
+  const data = (body as { data: { url: string; path: string } }).data;
+  return { success: true, url: data.url, path: data.path };
 }

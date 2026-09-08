@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   title: "Our Little World — Tempat Privat Kita Berdua",
   description:
     "Ruang digital tertutup untuk menyimpan kenangan, cerita, dan rencana bersama pasangan.",
+  icons: {
+    icon: "/icon.webp",
+    apple: "/icon.webp",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

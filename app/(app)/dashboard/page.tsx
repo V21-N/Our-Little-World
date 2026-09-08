@@ -288,6 +288,14 @@ export default function DashboardPage() {
                     href={`/memories/${m.id}`}
                     className="group relative aspect-square overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-primary/15 via-accent/30 to-secondary/40"
                   >
+                    {m.images[0] && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={m.images[0].url}
+                        alt={m.caption ?? "Memory"}
+                        className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                     <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-foreground shadow-sm">
                       <Icon className="h-3 w-3 text-primary" />

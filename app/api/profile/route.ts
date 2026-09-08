@@ -9,7 +9,7 @@ const profileSchema = z.object({
   fullName: z.string().min(1).max(100).optional(),
   nickname: z.string().max(50).nullable().optional(),
   birthday: z.string().nullable().optional(),
-  avatarUrl: z.string().max(500).nullable().optional(),
+  avatarUrl: z.string().max(2000).nullable().optional(),
 });
 
 export async function GET(request: NextRequest) {
