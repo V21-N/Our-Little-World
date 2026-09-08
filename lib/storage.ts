@@ -20,14 +20,7 @@ async function ensureBucket() {
   const supabase = getStorageClient();
   const existing = await supabase.storage.getBucket(BUCKET);
   if (!existing.error) return supabase;
-
-  const created = await supabase.storage.createBucket(BUCKET, {
-    public: false,
-    fileSizeLimit: "8MB",
-    allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"],
-  });
-  if (created.error) throw created.error;
-  return supabase;
+  throw new Error(`Supabase Storage bucket '${BUCKET}' is missing`);
 }
 
 export async function uploadImage(

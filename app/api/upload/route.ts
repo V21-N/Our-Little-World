@@ -33,6 +33,9 @@ export async function POST(request: NextRequest) {
 
     return ok({ path: uploaded.path, url: uploaded.url }, 201);
   } catch (e) {
+    if (e instanceof Error && e.message.startsWith("Supabase Storage")) {
+      return fail(e.message, "STORAGE_NOT_CONFIGURED", 503);
+    }
     return handleError(e);
   }
 }
