@@ -2,6 +2,7 @@ import "server-only";
 import { db } from "@/lib/db";
 import { memories, memoryImages } from "@/lib/db/schema";
 import { asc, desc, eq, and, sql } from "drizzle-orm";
+import { getImageUrl } from "@/lib/storage";
 
 export async function getMemoryById(id: string) {
   const memory = await db.query.memories.findFirst({
@@ -44,17 +45,22 @@ export async function listMemories(params: {
   }
 
   return {
-    items: page.map((m) => serialize({ ...m, images: images.filter((i) => i.memoryId === m.id) })),
+    items: await Promise.all(
+      page.map((m) => serialize({ ...m, images: images.filter((i) => i.memoryId === m.id) })),
+    ),
     nextCursor: hasMore ? page[page.length - 1].id : null,
   };
 }
 
-function serialize(memory: any) {
+async function serialize(memory: any) {
   return {
     ...memory,
     tags: (memory.tags as string[]) ?? [],
-    images: (memory.images ?? [])
-      .map((i: any) => ({ ...i, url: `/${i.storagePath.replace(/\\/g, "/")}` }))
-      .sort((a: any, b: any) => a.position - b.position),
+    images: await Promise.all(
+      (memory.images ?? []).map(async (i: any) => ({
+        ...i,
+        url: await getImageUrl(i.storagePath),
+      })),
+    ).then((result) => result.sort((a, b) => a.position - b.position)),
   };
 }

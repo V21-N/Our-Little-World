@@ -7,17 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/hooks/use-auth";
 
 function InviteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { refresh } = useAuth();
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<"link" | "code" | null>(null);
 
   const inviteCode = searchParams.get("code") ?? "";
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
   const inviteLink = inviteCode ? `${siteUrl}/join/${inviteCode}` : "";
-  const canShare = Boolean(inviteCode && inviteLink);
 
   const copy = async (text: string, kind: "link" | "code") => {
     if (!text) return;
@@ -27,8 +28,9 @@ function InviteContent() {
     setTimeout(() => setCopied(null), 1500);
   };
 
-  const finishOnboarding = () => {
+  const finishOnboarding = async () => {
     setLoading(true);
+    await refresh();
     router.push("/dashboard");
   };
 
@@ -125,7 +127,15 @@ function InviteContent() {
       </Card>
 
       <div className="flex items-center justify-between border-t border-border pt-6">
-        <Button variant="ghost" onClick={() => router.push("/dashboard")}>
+        <Button
+          variant="ghost"
+          onClick={async () => {
+            setLoading(true);
+            await refresh();
+            router.push("/dashboard");
+          }}
+          disabled={loading}
+        >
           Nanti saja
         </Button>
         <Button onClick={finishOnboarding} disabled={loading}>

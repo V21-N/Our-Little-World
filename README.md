@@ -178,7 +178,7 @@ scripts/                     # seed scripts (achievements)
 
 - All couple-scoped data (memories, letters, mood, etc.) is enforced server-side via `requireCoupleMembership` in `lib/api/helpers.ts`. There is no client-side data leak path.
 - Auth is cookie-based; sessions are signed with `BETTER_AUTH_SECRET`.
-- File uploads go to `public/uploads/<entity>/<scopeId>/` for now (suitable for self-hosted). If you wire Supabase Storage, swap the `uploadFile` implementation in `app/api/upload/route.ts`.
+- File uploads go to a private Supabase Storage bucket (configured with `SUPABASE_STORAGE_BUCKET`, default `media`). The database stores only the object path; memory responses contain short-lived signed URLs.
 - The home page is the only public marketing surface. Everything else requires a session.
 
 ---
@@ -188,7 +188,7 @@ scripts/                     # seed scripts (achievements)
 Any Node.js host works. Recommended:
 
 1. Provision Postgres (Supabase, Neon, or a managed instance). For Supabase, use the IPv4-compatible pooler connection string from **Connect** for `DATABASE_URL`; the direct `db.<project-ref>.supabase.co` endpoint may be IPv6-only and unreachable from some local/Vercel runtimes.
-2. Set the env vars (`DATABASE_URL`, `BETTER_AUTH_SECRET`, and either `BETTER_AUTH_URL`, `SITE_URL`, or `NEXT_PUBLIC_SITE_URL` with the production URL). Vercel environment changes require a new deployment.
+2. Set the env vars (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and either `BETTER_AUTH_URL`, `SITE_URL`, or `NEXT_PUBLIC_SITE_URL` with the production URL). Vercel environment changes require a new deployment. `SUPABASE_STORAGE_BUCKET` is optional and defaults to `media`.
 3. Run `npm run db:push` (or apply migrations).
 4. Deploy: `npm run build && npm start`.
 

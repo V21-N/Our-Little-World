@@ -1,8 +1,7 @@
 import { NextRequest } from "next/server";
 import { ok, fail, handleError, requireUser } from "@/lib/api/helpers";
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import { join } from "path";
+import { uploadImage } from "@/lib/storage";
 
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_SIZE = 8 * 1024 * 1024;
@@ -25,13 +24,14 @@ export async function POST(request: NextRequest) {
 
     const ext = file.type === "image/png" ? ".png" : file.type === "image/webp" ? ".webp" : ".jpg";
     const filename = `${randomUUID()}${ext}`;
-    const relPath = `uploads/${entity}/${scopeId}/${filename}`;
-    const storageDir = join(process.cwd(), "public", "uploads", entity, scopeId);
+    const storagePath = `${entity}/${scopeId}/${filename}`;
+    const uploaded = await uploadImage(
+      storagePath,
+      Buffer.from(await file.arrayBuffer()),
+      file.type,
+    );
 
-    await mkdir(storageDir, { recursive: true });
-    await writeFile(join(storageDir, filename), Buffer.from(await file.arrayBuffer()));
-
-    return ok({ path: relPath, url: `/${relPath.replace(/\\/g, "/")}` }, 201);
+    return ok({ path: uploaded.path, url: uploaded.url }, 201);
   } catch (e) {
     return handleError(e);
   }
