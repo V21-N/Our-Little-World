@@ -3,6 +3,7 @@ import { Geist, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PwaRegister } from "@/components/pwa-register";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   title: "Our Little World — Tempat Privat Kita Berdua",
   description:
     "Ruang digital tertutup untuk menyimpan kenangan, cerita, dan rencana bersama pasangan.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/icon.webp",
     apple: "/icon.webp",
@@ -36,6 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <TooltipProvider delayDuration={150}>
           {children}
           <Toaster />
+          <PwaRegister />
         </TooltipProvider>
       </body>
     </html>
