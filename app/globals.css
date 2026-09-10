@@ -8,49 +8,49 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
 
-  /* Romantic + Minimal + Premium palette
-     - dusty rose / blush accents
-     - cream / off-white ground
-     - charcoal for text
+  /* Yugma palette
+     - Warm Ivory background
+     - Deep Plum text
+     - Muted Burgundy accents
   */
-  --color-background: hsl(36 33% 97%);
-  --color-foreground: hsl(20 14% 18%);
+  --color-background: #FAF6F1;
+  --color-foreground: #3B2533;
 
-  --color-card: hsl(36 50% 99%);
-  --color-card-foreground: hsl(20 14% 18%);
+  --color-card: #FFFCF9;
+  --color-card-foreground: #3B2533;
 
-  --color-popover: hsl(36 50% 99%);
-  --color-popover-foreground: hsl(20 14% 18%);
+  --color-popover: #FFFCF9;
+  --color-popover-foreground: #3B2533;
 
-  --color-primary: hsl(350 35% 55%);
-  --color-primary-foreground: hsl(36 50% 99%);
+  --color-primary: #713B4A;
+  --color-primary-foreground: #FFFCF9;
 
-  --color-secondary: hsl(28 40% 92%);
-  --color-secondary-foreground: hsl(20 14% 22%);
+  --color-secondary: #F3E8E6;
+  --color-secondary-foreground: #3B2533;
 
-  --color-muted: hsl(33 30% 93%);
-  --color-muted-foreground: hsl(20 8% 42%);
+  --color-muted: #F3E8E6;
+  --color-muted-foreground: #806F76;
 
-  --color-accent: hsl(20 25% 88%);
-  --color-accent-foreground: hsl(20 14% 22%);
+  --color-accent: #B97886;
+  --color-accent-foreground: #3B2533;
 
-  --color-destructive: hsl(0 60% 50%);
-  --color-destructive-foreground: hsl(36 50% 99%);
+  --color-destructive: #A6535D;
+  --color-destructive-foreground: #FFFCF9;
 
-  --color-border: hsl(28 25% 88%);
-  --color-input: hsl(28 25% 88%);
-  --color-ring: hsl(350 35% 55%);
+  --color-border: #E5D6D5;
+  --color-input: #E5D6D5;
+  --color-ring: #4B2732;
 
   --radius: 0.75rem;
 
-  --color-sidebar: hsl(36 40% 98%);
-  --color-sidebar-foreground: hsl(20 14% 22%);
-  --color-sidebar-primary: hsl(350 35% 55%);
-  --color-sidebar-primary-foreground: hsl(36 50% 99%);
-  --color-sidebar-accent: hsl(33 30% 93%);
-  --color-sidebar-accent-foreground: hsl(20 14% 22%);
-  --color-sidebar-border: hsl(28 25% 88%);
-  --color-sidebar-ring: hsl(350 35% 55%);
+  --color-sidebar: #FAF6F1;
+  --color-sidebar-foreground: #3B2533;
+  --color-sidebar-primary: #713B4A;
+  --color-sidebar-primary-foreground: #FFFCF9;
+  --color-sidebar-accent: #F3E8E6;
+  --color-sidebar-accent-foreground: #3B2533;
+  --color-sidebar-border: #E5D6D5;
+  --color-sidebar-ring: #4B2732;
 }
 
 @layer base {

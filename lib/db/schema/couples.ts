@@ -26,12 +26,12 @@ export const coupleMembers = pgTable(
       .references(() => couples.id, { onDelete: "cascade" }),
     userId: text("user_id")
       .notNull()
+      .unique()
       .references(() => profiles.id, { onDelete: "cascade" }),
     role: text("role").notNull(),
     joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    index("couple_members_user_idx").on(table.userId),
     index("couple_members_couple_idx").on(table.coupleId),
   ]
 );

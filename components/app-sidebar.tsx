@@ -10,6 +10,17 @@ import { useAuth } from "@/lib/hooks/use-auth";
 import { primaryNav, secondaryNav } from "@/lib/nav";
 import { usePathname } from "next/navigation";
 
+// Logo Icon SVG Yugma untuk Sidebar
+function YugmaLogoIcon({ className = "h-full w-full" }: { className?: string; color?: string }) {
+  return (
+    <img 
+      src="/Yugma-Icon.svg" 
+      alt="Yugma Logo" 
+      className={cn("h-full w-full object-contain shrink-0 mix-blend-multiply scale-110", className)} 
+    />
+  );
+}
+
 export function AppSidebar() {
   const pathname = usePathname();
   const { profile, user } = useAuth();
@@ -22,13 +33,16 @@ export function AppSidebar() {
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-primary/8 to-transparent"
       />
-      <div className="relative flex items-center gap-2 px-6 py-6 font-serif text-lg font-semibold">
-        <span className="heartbeat flex h-8 w-8 overflow-hidden rounded-full bg-sidebar-primary/15">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.webp" alt="Our Little World" className="h-full w-full object-cover" />
+      
+      {/* Brand Header */}
+      <Link href="/dashboard" className="relative flex items-center gap-4 px-6 py-6 transition hover:opacity-90">
+        <span className="heartbeat flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sidebar-primary/15 shadow-sm">
+          <YugmaLogoIcon />
         </span>
-        Our Little World
-      </div>
+        <span className="font-serif text-xl h-8 font-bold tracking-wider text-sidebar-foreground">
+          Yugma
+        </span>
+      </Link>
 
       <nav className="relative flex-1 overflow-y-auto px-3">
         <ul className="space-y-0.5">

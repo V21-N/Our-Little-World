@@ -34,7 +34,7 @@ export function MobileHeader() {
   const matched = allNav.find(
     (item) => pathname === item.href || pathname.startsWith(item.href + "/"),
   );
-  const title = matched?.title ?? "Our Little World";
+  const title = matched?.title ?? "Yugma";
 
   useEffect(() => {
     if (!searchOpen) return;
@@ -91,7 +91,7 @@ export function MobileHeader() {
       <Link href="/dashboard" className="flex items-center gap-2">
         <span className="heartbeat flex h-7 w-7 overflow-hidden rounded-full bg-primary/15">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.webp" alt="Our Little World" className="h-full w-full object-cover" />
+          <img src="/Yugma-Icon.svg" alt="Yugma" className="h-full w-full object-cover" />
         </span>
         <span className="font-serif text-base font-semibold">{title}</span>
       </Link>

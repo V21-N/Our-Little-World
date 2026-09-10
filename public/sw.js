@@ -1,8 +1,8 @@
-const CACHE_NAME = "our-little-world-v1";
+const CACHE_NAME = "yugma-v1";
 const STATIC_ASSETS = [
   "/",
   "/dashboard",
-  "/icon.webp",
+  "/Yugma-Icon.svg",
   "/manifest.json",
 ];
 

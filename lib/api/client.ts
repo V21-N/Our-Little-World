@@ -10,6 +10,7 @@ export async function apiFetch<T>(
   options?: RequestInit
 ): Promise<ApiOk<T> | ApiErr> {
   const res = await fetch(path, {
+    cache: "no-store",
     ...options,
     headers: {
       "Content-Type": "application/json",

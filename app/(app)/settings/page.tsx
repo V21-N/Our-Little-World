@@ -15,6 +15,7 @@ import {
   Trash2,
   User,
   UserMinus,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,7 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatDate, initials } from "@/lib/utils";
 import { toast } from "sonner";
-import { useAuth } from "@/lib/hooks/use-auth";
+import { useAuth, type CurrentProfile } from "@/lib/hooks/use-auth";
 import { authClient } from "@/lib/auth-client";
 import { uploadFile } from "@/lib/api/client";
 import { apiFetch } from "@/lib/api/client";
@@ -44,6 +45,16 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showLeave, setShowLeave] = useState(false);
+  
+  // State untuk Hapus Akun
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
+
+  // State untuk Pending File Avatar & Preview
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  // Loading States
   const [regenerating, setRegenerating] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingCouple, setSavingCouple] = useState(false);
@@ -89,24 +100,28 @@ export default function SettingsPage() {
   if (!user || !profile) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#6B2D39]" />
       </div>
     );
   }
 
   if (!couple) {
     return (
-      <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 text-center">
-        <SettingsIcon className="h-8 w-8 text-primary" />
-        <h1 className="mt-4 font-serif text-3xl tracking-tight">Pengaturan akun</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Kamu belum bergabung dengan couple. Buat atau terima undangan terlebih dahulu.
+      <div className="mx-auto flex min-h-[80vh] max-w-md flex-col items-center justify-center px-6 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#6B2D39]/10 text-[#6B2D39] mb-4">
+          <SettingsIcon className="h-8 w-8" />
+        </div>
+        <h1 className="font-serif text-3xl font-bold tracking-tight text-[#2B1B22]">Pengaturan Ruang</h1>
+        <p className="mt-3 text-sm text-[#2B1B22]/70 leading-relaxed">
+          Kamu belum bergabung dengan ruang manapun. Buat atau terima undangan terlebih dahulu untuk memulai Yugma.
         </p>
-        <div className="mt-6 flex gap-3">
-          <Button variant="outline" onClick={() => router.push("/")}>Beranda</Button>
-          <Button onClick={logout}>
-            <LogOut className="h-4 w-4" />
-            Keluar
+        <div className="mt-8 flex gap-3 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => router.push("/")} className="rounded-full border-[#EFE6DD] w-full sm:w-auto">
+            Beranda
+          </Button>
+          <Button onClick={logout} className="rounded-full bg-[#6B2D39] hover:bg-[#54232C] text-[#FDFBF7] w-full sm:w-auto">
+            <LogOut className="h-4 w-4 mr-2" />
+            Keluar Sesi
           </Button>
         </div>
       </div>
@@ -130,41 +145,60 @@ export default function SettingsPage() {
     });
     setRegenerating(false);
     if (res.success) {
-      toast.success("Kode undangan baru dibuat");
+      toast.success("Kode undangan baru berhasil dibuat");
       refresh();
     } else {
       toast.error(res.error);
     }
   };
 
-  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const result = await uploadFile(file, "avatars", user.id);
-    if (result.success && result.url) {
-      setProfileForm((prev) => ({ ...prev, avatarUrl: result.url! }));
-      toast.success("Foto diupload");
-    } else {
-      toast.error(result.error ?? "Upload gagal");
-    }
+
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
     e.target.value = "";
   };
 
   const saveProfile = async () => {
     setSavingProfile(true);
-    const res = await apiFetch("/api/profile", {
+    let finalAvatarUrl = profileForm.avatarUrl;
+
+    if (avatarFile) {
+      const uploadResult = await uploadFile(avatarFile, "avatars", user.id);
+      if (!uploadResult.success || !uploadResult.url) {
+        toast.error(uploadResult.error ?? "Gagal mengupload foto");
+        setSavingProfile(false);
+        return;
+      }
+      finalAvatarUrl = uploadResult.url;
+    }
+
+    const res = await apiFetch<CurrentProfile>("/api/profile", {
       method: "PATCH",
       body: JSON.stringify({
         fullName: profileForm.fullName,
         nickname: profileForm.nickname || null,
         birthday: profileForm.birthday || null,
-        avatarUrl: profileForm.avatarUrl || null,
+        avatarUrl: finalAvatarUrl || null,
       }),
     });
+
     setSavingProfile(false);
     if (res.success) {
-      toast.success("Profil diperbarui");
-      refresh();
+      toast.success("Profil berhasil diperbarui");
+      const updatedUrl = res.data.avatarUrl ?? finalAvatarUrl;
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      setProfileForm((prev) => ({
+        ...prev,
+        fullName: res.data.fullName,
+        nickname: res.data.nickname ?? "",
+        birthday: res.data.birthday ?? "",
+        avatarUrl: updatedUrl ?? "",
+      }));
+      await refresh();
     } else {
       toast.error(res.error);
     }
@@ -180,7 +214,7 @@ export default function SettingsPage() {
     });
     setSavingCouple(false);
     if (res.success) {
-      toast.success("Pengaturan couple diperbarui");
+      toast.success("Pengaturan ruang berhasil disimpan");
       refresh();
     } else {
       toast.error(res.error);
@@ -195,7 +229,7 @@ export default function SettingsPage() {
     setLeaving(false);
     setShowLeave(false);
     if (res.success) {
-      toast.success("Kamu keluar dari couple");
+      toast.success("Kamu telah keluar dari ruang couple ini");
       await refresh();
       router.push("/onboarding/create-couple");
     } else {
@@ -203,298 +237,366 @@ export default function SettingsPage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      toast.error("Silakan masukkan kata sandi untuk mengonfirmasi.");
+      return;
+    }
+
+    setDeletingAccount(true);
+    try {
+      const { error } = await authClient.deleteUser({
+        password: deletePassword,
+      });
+      
+      if (error) {
+        toast.error(error.message ?? "Gagal menghapus akun. Pastikan kata sandimu benar.");
+        setDeletingAccount(false);
+        return;
+      }
+
+      toast.success("Akun berhasil dihapus permanen.");
+      await logout();
+    } catch (e) {
+      toast.error("Terjadi kesalahan sistem saat menghapus akun.");
+      setDeletingAccount(false);
+    }
+  };
+
   return (
-    <div className="mx-auto max-w-3xl px-5 py-6 lg:py-10 lg:pr-8">
-      <header className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+    <div className="mx-auto max-w-3xl px-5 py-6 lg:py-10 lg:pr-8 text-[#2B1B22]">
+      <header className="mb-8">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6B2D39]">
           Profile & Settings
         </p>
-        <h1 className="mt-1 font-serif text-3xl tracking-tight md:text-4xl">
+        <h1 className="mt-2 font-serif text-3xl font-bold tracking-tight md:text-4xl">
           Pengaturan
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Atur profilmu, data couple, dan akun.
+        <p className="mt-2 text-sm text-[#2B1B22]/70">
+          Atur identitasmu, detail ruang Yugma, dan preferensi akun.
         </p>
       </header>
 
-      <section className="mb-6">
-        <SectionHeader icon={User} title="Profil kamu" />
-        <Card className="border-border/60">
-          <CardContent className="space-y-5 pt-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={profileForm.avatarUrl || undefined} alt={profileForm.fullName} />
-                <AvatarFallback>{initials(profileForm.fullName || user.name)}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="font-serif text-lg">{profileForm.fullName || user.name}</p>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
+      {/* SECTION 1: PROFIL */}
+      <section className="mb-8">
+        <SectionHeader icon={User} title="Profil Personal" />
+        <Card className="rounded-3xl border border-[#EFE6DD] bg-[#FDFBF7] shadow-sm">
+          <CardContent className="space-y-6 pt-6">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <div className="relative">
+                <Avatar className="h-20 w-20 ring-4 ring-[#F8F4EE] bg-[#D4A5A5]/20">
+                  <AvatarImage 
+                    src={avatarPreview || profileForm.avatarUrl || profile?.avatarUrl || undefined} 
+                    alt={profileForm.fullName} 
+                    className="object-cover" 
+                  />
+                  <AvatarFallback className="text-xl font-serif text-[#6B2D39]">
+                    {initials(profileForm.fullName || user.name)}
+                  </AvatarFallback>
+                </Avatar>
+                
+                {savingProfile && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-[2px]">
+                    <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 text-center sm:text-left">
+                <p className="font-serif text-xl font-semibold text-[#2B1B22]">{profileForm.fullName || user.name}</p>
+                <p className="text-sm text-[#2B1B22]/60">{user.email}</p>
+                {avatarFile && (
+                  <p className="text-xs text-[#6B2D39] font-medium mt-1">
+                    *Foto baru dipilih (belum disimpan)
+                  </p>
+                )}
               </div>
               <label className="cursor-pointer">
-                <Button variant="outline" size="sm" asChild>
-                  <span>Ganti foto</span>
+                <Button variant="outline" size="sm" asChild className="rounded-full border-[#EFE6DD] hover:bg-[#F8F4EE] hover:text-[#6B2D39]">
+                  <span>Pilih Foto</span>
                 </Button>
                 <input type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
               </label>
             </div>
 
-            <Separator />
+            <Separator className="bg-[#EFE6DD]" />
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Nama lengkap</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/70">Nama Lengkap</Label>
                 <Input
+                  className="h-11 rounded-xl border-[#EFE6DD] bg-[#FDFBF7] focus:border-[#6B2D39] focus:ring-[#6B2D39]/20"
                   value={profileForm.fullName}
                   onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Nama panggilan</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/70">Panggilan Sayang</Label>
                 <Input
+                  className="h-11 rounded-xl border-[#EFE6DD] bg-[#FDFBF7] focus:border-[#6B2D39] focus:ring-[#6B2D39]/20"
                   value={profileForm.nickname}
-                  placeholder="Bisa dipanggil apa?"
+                  placeholder="Biasa dipanggil apa?"
                   onChange={(e) => setProfileForm({ ...profileForm, nickname: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Tanggal lahir</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/70">Tanggal Lahir</Label>
                 <Input
                   type="date"
+                  className="h-11 rounded-xl border-[#EFE6DD] bg-[#FDFBF7] focus:border-[#6B2D39] focus:ring-[#6B2D39]/20"
                   value={profileForm.birthday}
                   onChange={(e) => setProfileForm({ ...profileForm, birthday: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Email</Label>
-                <Input type="email" value={user.email} disabled />
+                <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/70">Email Terdaftar</Label>
+                <Input type="email" value={user.email} disabled className="h-11 rounded-xl border-[#EFE6DD] bg-[#F8F4EE] text-[#2B1B22]/50" />
               </div>
             </div>
-            <Button onClick={saveProfile} disabled={savingProfile}>
-              {savingProfile && <Loader2 className="h-4 w-4 animate-spin" />}
-              Simpan profil
+            <Button onClick={saveProfile} disabled={savingProfile} className="rounded-full bg-[#6B2D39] hover:bg-[#54232C] text-[#FDFBF7]">
+              {savingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Simpan Perubahan
             </Button>
           </CardContent>
         </Card>
       </section>
 
-      <section className="mb-6">
-        <SectionHeader icon={SettingsIcon} title="Pengaturan couple" />
-        <Card className="border-border/60">
-          <CardContent className="space-y-5 pt-6">
-            <div className="grid gap-4 sm:grid-cols-2">
+      {/* SECTION 2: PENGATURAN RUANG (COUPLE) */}
+      <section className="mb-8">
+        <SectionHeader icon={Heart} title="Pengaturan Ruang" />
+        <Card className="rounded-3xl border border-[#EFE6DD] bg-[#FDFBF7] shadow-sm">
+          <CardContent className="space-y-6 pt-6">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Nama couple</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/70">Nama Ruangan</Label>
                 <Input
+                  className="h-11 rounded-xl border-[#EFE6DD] bg-[#FDFBF7] focus:border-[#6B2D39] focus:ring-[#6B2D39]/20"
                   value={coupleForm.coupleName}
-                  placeholder="Alvin & Manda"
+                  placeholder="Misal: Alvin & Manda"
                   onChange={(e) => setCoupleForm({ ...coupleForm, coupleName: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Tanggal mulai hubungan</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/70">Tanggal Jadian</Label>
                 <Input
                   type="date"
+                  className="h-11 rounded-xl border-[#EFE6DD] bg-[#F8F4EE] text-[#2B1B22]/60"
                   value={coupleForm.relationshipStartDate}
                   disabled
                 />
               </div>
             </div>
 
-            <Separator />
+            <Separator className="bg-[#EFE6DD]" />
 
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Pasangan
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#2B1B22]/60">
+                Partner Kamu
               </p>
-              <div className="mt-3 flex items-center gap-3 rounded-xl bg-secondary/40 p-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback>{initials("Pasangan")}</AvatarFallback>
+              <div className="mt-3 flex items-center gap-4 rounded-2xl border border-[#EFE6DD] bg-[#F8F4EE]/50 p-4">
+                <Avatar className="h-12 w-12 bg-[#D4A5A5]/20 text-[#6B2D39]">
+                  <AvatarFallback className="font-serif font-semibold">{initials("Pasangan")}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="font-medium">Pasanganmu</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="font-medium text-[#2B1B22]">Pasanganmu</p>
+                  <p className="text-xs text-[#2B1B22]/60 mt-0.5">
                     Bergabung sejak{" "}
                     {couple.createdAt ? formatDate(couple.createdAt, { day: "numeric", month: "long", year: "numeric" }) : "—"}
                   </p>
                 </div>
-                <Badge variant="success">Aktif</Badge>
+                <Badge className="bg-[#6B2D39]/10 text-[#6B2D39] hover:bg-[#6B2D39]/20 border-none shadow-none">Aktif</Badge>
               </div>
             </div>
 
-            <Separator />
+            <Separator className="bg-[#EFE6DD]" />
 
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Kode undangan
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#2B1B22]/60">
+                Kode Undangan
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Gunakan ini untuk mengundang pasangan baru (jika pasanganmu keluar).
+              <p className="mt-1 text-xs text-[#2B1B22]/60">
+                Gunakan ini untuk mengundang pasangan baru (hanya jika pasanganmu saat ini keluar).
               </p>
-              <div className="mt-3 flex items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-primary/5 p-3">
-                <code className="flex-1 font-mono text-lg font-semibold tracking-[0.3em] text-primary">
+              <div className="mt-4 flex items-center gap-3 rounded-2xl border border-dashed border-[#D4A5A5]/60 bg-[#D4A5A5]/5 p-3">
+                <code className="flex-1 px-2 font-mono text-xl font-bold tracking-[0.25em] text-[#6B2D39]">
                   {couple.inviteCode}
                 </code>
-                <Button size="icon-sm" variant="outline" onClick={copyInvite}>
-                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                <Button size="icon" variant="outline" onClick={copyInvite} className="rounded-xl border-[#D4A5A5]/40 text-[#6B2D39] hover:bg-[#6B2D39]/10 hover:border-[#6B2D39]/30">
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
                 <Button
-                  size="icon-sm"
+                  size="icon"
                   variant="outline"
                   onClick={regenerateCode}
                   disabled={regenerating}
+                  className="rounded-xl border-[#D4A5A5]/40 text-[#6B2D39] hover:bg-[#6B2D39]/10 hover:border-[#6B2D39]/30"
                 >
-                  {regenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
+                  {regenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCw className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
 
-            <Button onClick={saveCouple} disabled={savingCouple}>
-              {savingCouple && <Loader2 className="h-4 w-4 animate-spin" />}
-              Simpan pengaturan couple
+            <Button onClick={saveCouple} disabled={savingCouple} className="rounded-full bg-[#6B2D39] hover:bg-[#54232C] text-[#FDFBF7]">
+              {savingCouple && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Simpan Ruang
             </Button>
           </CardContent>
         </Card>
       </section>
 
-      <section className="mb-6">
-        <SectionHeader icon={UserMinus} title="Keluar dari couple" />
-        <Card className="border-border/60">
-          <CardContent className="space-y-3 pt-6">
-            <p className="text-sm text-muted-foreground">
-              Keluar dari couple saat ini. Pasanganmu yang tersisa tetap punya akses ke kenangan.
-              Jika kamu ingin menerima undangan baru atau membuat couple baru, lakukan ini dulu.
+      {/* SECTION 3: KELUAR RUANGAN */}
+      <section className="mb-8">
+        <SectionHeader icon={UserMinus} title="Keluar dari Ruang" />
+        <Card className="rounded-3xl border border-[#EFE6DD] bg-[#FDFBF7] shadow-sm">
+          <CardContent className="space-y-4 pt-6">
+            <p className="text-sm leading-relaxed text-[#2B1B22]/70">
+              Keluar dari ruang Yugma ini. Pasanganmu yang tersisa akan tetap memegang kendali atas kenangan. Lakukan ini jika kamu ingin membuat ruang baru.
             </p>
             <Button
               variant="outline"
-              className="w-full justify-between"
+              className="w-full justify-between rounded-xl border-[#EFE6DD] text-[#2B1B22] hover:bg-[#F8F4EE] hover:text-[#6B2D39]"
               onClick={() => setShowLeave(true)}
             >
-              <span>Keluar dari couple ini</span>
-              <UserMinus className="h-4 w-4" />
+              <span className="font-medium">Keluar dari ruang ini</span>
+              <UserMinus className="h-4 w-4 text-[#6B2D39]" />
             </Button>
           </CardContent>
         </Card>
       </section>
 
-      <section className="mb-6">
+      {/* SECTION 4: NOTIFIKASI */}
+      <section className="mb-8">
         <SectionHeader icon={Bell} title="Notifikasi" />
-        <Card className="border-border/60">
-          <CardContent className="space-y-1 divide-y divide-border/40 pt-2">
+        <Card className="rounded-3xl border border-[#EFE6DD] bg-[#FDFBF7] shadow-sm">
+          <CardContent className="divide-y divide-[#EFE6DD] pt-2">
             <ToggleRow
-              title="Mood harian pasangan"
-              description="Tampilkan mood pasangan di dashboard"
+              title="Mood Harian Pasangan"
+              description="Tampilkan emoji mood terbaru pasangan di dashboard"
               defaultChecked
             />
             <ToggleRow
-              title="Notifikasi milestone"
-              description="Pemberitahuan saat melewati hari penting"
+              title="Notifikasi Milestone"
+              description="Pemberitahuan saat melewati hari bersejarah kalian"
               defaultChecked
             />
             <ToggleRow
-              title="Email pengingat anniversary"
-              description="Kami kirim pengingat 7 hari sebelum anniversary"
+              title="Pengingat Anniversary"
+              description="Kirim notifikasi email 7 hari sebelum perayaan"
               defaultChecked
             />
           </CardContent>
         </Card>
       </section>
 
-      <section className="mb-6">
-        <SectionHeader icon={KeyRound} title="Akun & Keamanan" />
-        <Card className="border-border/60">
-          <CardContent className="space-y-3 pt-6">
-            <Link
-              href="/forgot-password"
-              className="flex items-center justify-between rounded-xl border border-border/60 p-4 transition hover:border-primary/30 hover:bg-secondary/30"
-            >
-              <div>
-                <p className="text-sm font-medium">Ubah kata sandi</p>
-                <p className="text-xs text-muted-foreground">
-                  Kami akan kirim tautan reset ke email kamu
-                </p>
-              </div>
-              <span className="text-xs text-primary">Ubah →</span>
-            </Link>
-            <Button
-              variant="outline"
-              className="w-full justify-between"
-              onClick={logout}
-            >
-              <span>Keluar</span>
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
-
+      {/* SECTION 5: KEAMANAN & HAPUS AKUN */}
       <section className="mb-12">
-        <Card className="border-destructive/40 bg-destructive/5">
-          <CardContent className="space-y-3 pt-6">
-            <div className="flex items-start gap-3">
-              <Trash2 className="mt-0.5 h-5 w-5 text-destructive" />
-              <div>
-                <p className="font-serif text-base text-destructive">Hapus akun</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Menghapus akun akan mengeluarkanmu dari couple. Data couple tetap dapat
-                  diakses oleh pasangan yang tersisa. Jika kedua pasangan menghapus akun, data
-                  akan dihapus permanen setelah 30 hari.
-                </p>
+        <SectionHeader icon={KeyRound} title="Keamanan Akun" />
+        <div className="space-y-4">
+          <Card className="rounded-3xl border border-[#EFE6DD] bg-[#FDFBF7] shadow-sm">
+            <CardContent className="space-y-3 pt-6">
+              <Link
+                href="/forgot-password"
+                className="group flex items-center justify-between rounded-2xl border border-[#EFE6DD] bg-[#F8F4EE]/50 p-4 transition hover:border-[#D4A5A5]/60 hover:bg-[#D4A5A5]/5"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-[#2B1B22]">Ubah Kata Sandi</p>
+                  <p className="text-xs text-[#2B1B22]/60 mt-0.5">Kami akan kirim tautan reset ke email kamu</p>
+                </div>
+                <span className="text-xs font-medium text-[#6B2D39] transition-transform group-hover:translate-x-1">Ubah →</span>
+              </Link>
+              <Button
+                variant="outline"
+                className="w-full justify-between rounded-xl border-[#EFE6DD] hover:bg-[#F8F4EE]"
+                onClick={logout}
+              >
+                <span className="font-medium text-[#2B1B22]">Keluar (Logout)</span>
+                <LogOut className="h-4 w-4 text-[#2B1B22]/70" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* DANGER ZONE - HAPUS AKUN PERMANEN */}
+          <Card className="rounded-3xl border border-red-200 bg-red-50/50 shadow-sm">
+            <CardContent className="space-y-4 pt-6">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-red-100 p-1.5">
+                  <Trash2 className="h-4 w-4 text-red-600" />
+                </div>
+                <div>
+                  <p className="font-serif text-lg font-bold text-red-700">Hapus Akun Permanen</p>
+                  <p className="mt-1 text-xs leading-relaxed text-red-600/80">
+                    Menghapus akun akan memusnahkan seluruh aksesmu secara permanen. Jika tidak ada siapapun di dalam ruang setelah kamu pergi, sistem akan menghapus seluruh data dalam 30 hari.
+                  </p>
+                </div>
               </div>
-            </div>
-            <Button
-              variant="destructive"
-              onClick={() => setShowDelete(true)}
-              className="w-full"
-            >
-              Hapus akun saya
-            </Button>
-          </CardContent>
-        </Card>
+              <Button
+                variant="destructive"
+                onClick={() => setShowDelete(true)}
+                className="w-full rounded-full bg-red-600 hover:bg-red-700 shadow-sm"
+              >
+                Hapus Akun Saya Permanen
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
-      <Dialog open={showDelete} onOpenChange={setShowDelete}>
-        <DialogContent>
+      {/* DIALOG HAPUS AKUN */}
+      <Dialog open={showDelete} onOpenChange={(open) => { setShowDelete(open); if (!open) setDeletePassword(""); }}>
+        <DialogContent className="sm:rounded-3xl border-[#EFE6DD] bg-[#FDFBF7]">
           <DialogHeader>
-            <DialogTitle>Yakin ingin menghapus akun?</DialogTitle>
+            <DialogTitle className="font-serif text-2xl text-[#2B1B22]">Hapus Akun Permanen?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            Tindakan ini akan mengeluarkanmu dari couple. Pasanganmu akan tetap memiliki akses ke
-            seluruh kenangan kalian. Jika kamu berubah pikiran, hubungi kami dalam 30 hari.
-          </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDelete(false)}>
-              Batal
+          <div className="space-y-4 py-2">
+            <p className="text-sm leading-relaxed text-[#2B1B22]/70">
+              Tindakan ini tidak bisa dibatalkan. Kamu akan kehilangan seluruh akses ke Yugma, dan data personalmu akan dihapus dari server.
+            </p>
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/80">
+                Kata Sandi Konfirmasi
+              </Label>
+              <Input 
+                type="password" 
+                placeholder="Masukkan kata sandi kamu"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                className="h-11 rounded-xl border-[#EFE6DD] bg-[#FDFBF7] focus:border-red-500 focus:ring-red-500/20"
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-2 flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" className="rounded-full border-[#EFE6DD]" onClick={() => { setShowDelete(false); setDeletePassword(""); }} disabled={deletingAccount}>
+              Batalkan
             </Button>
             <Button
               variant="destructive"
-              onClick={async () => {
-                await logout();
-              }}
+              className="rounded-full bg-red-600 hover:bg-red-700"
+              onClick={handleDeleteAccount}
+              disabled={deletingAccount || !deletePassword}
             >
-              Hapus akun
+              {deletingAccount ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Ya, Hapus Akun
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* DIALOG KELUAR RUANGAN */}
       <Dialog open={showLeave} onOpenChange={setShowLeave}>
-        <DialogContent>
+        <DialogContent className="sm:rounded-3xl border-[#EFE6DD] bg-[#FDFBF7]">
           <DialogHeader>
-            <DialogTitle>Keluar dari couple?</DialogTitle>
+            <DialogTitle className="font-serif text-2xl text-[#2B1B22]">Keluar dari Ruang?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            Kamu akan keluar dari couple{" "}
-            <strong>{couple.coupleName ?? "saat ini"}</strong>. Pasanganmu yang tersisa tetap
-            punya akses ke kenangan kalian. Kamu bisa membuat atau menerima undangan baru setelah
-            keluar.
+          <p className="text-sm leading-relaxed text-[#2B1B22]/70">
+            Kamu akan meninggalkan ruang <strong className="text-[#6B2D39]">{couple.coupleName ?? "saat ini"}</strong>. Pasanganmu tetap bisa melihat kenangan yang sudah ada.
           </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowLeave(false)} disabled={leaving}>
+          <DialogFooter className="mt-2 flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" className="rounded-full border-[#EFE6DD]" onClick={() => setShowLeave(false)} disabled={leaving}>
               Batal
             </Button>
-            <Button variant="destructive" onClick={leaveCouple} disabled={leaving}>
-              {leaving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Ya, keluar
+            <Button variant="destructive" className="rounded-full bg-[#6B2D39] text-[#FDFBF7] hover:bg-[#54232C]" onClick={leaveCouple} disabled={leaving}>
+              {leaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Ya, Keluar Ruangan
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -511,9 +613,11 @@ function SectionHeader({
   title: string;
 }) {
   return (
-    <div className="mb-3 flex items-center gap-2">
-      <Icon className="h-4 w-4 text-primary" />
-      <h2 className="font-serif text-lg">{title}</h2>
+    <div className="mb-4 flex items-center gap-2.5">
+      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#6B2D39]/10">
+        <Icon className="h-4 w-4 text-[#6B2D39]" />
+      </div>
+      <h2 className="font-serif text-xl font-semibold text-[#2B1B22]">{title}</h2>
     </div>
   );
 }
@@ -529,12 +633,16 @@ function ToggleRow({
 }) {
   const [checked, setChecked] = useState(defaultChecked ?? false);
   return (
-    <div className="flex items-center justify-between gap-3 py-3">
+    <div className="flex items-center justify-between gap-4 py-4">
       <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <p className="text-sm font-semibold text-[#2B1B22]">{title}</p>
+        <p className="text-xs text-[#2B1B22]/60 mt-0.5">{description}</p>
       </div>
-      <Switch checked={checked} onCheckedChange={setChecked} />
+      <Switch 
+        checked={checked} 
+        onCheckedChange={setChecked} 
+        className="data-[state=checked]:bg-[#6B2D39] data-[state=unchecked]:bg-[#EFE6DD]"
+      />
     </div>
   );
 }

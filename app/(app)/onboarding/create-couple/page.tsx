@@ -82,11 +82,23 @@ export default function CreateCouplePage() {
       <FloatingHearts count={10} />
       <div className="relative mx-auto max-w-xl">
         <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-serif text-lg font-semibold">
-            <span className="heartbeat flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
-              <Heart className="h-4 w-4" fill="currentColor" />
+          <div className="flex items-center gap-2.5">
+            <img
+              src="/Yugma-Icon.svg"
+              alt="Yugma Logo"
+              className="heartbeat h-8 w-8 shrink-0 object-contain mix-blend-multiply"
+            />
+            <span
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: "20px",
+                fontWeight: "600",
+                letterSpacing: "0.2em",
+                color: "#6B2D39",
+              }}
+            >
+              YUGMA
             </span>
-            Our Little World
           </div>
           <div className="flex items-center gap-3">
             <div className="text-xs text-muted-foreground">

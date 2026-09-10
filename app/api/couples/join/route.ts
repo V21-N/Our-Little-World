@@ -20,51 +20,70 @@ export async function POST(request: NextRequest) {
     const session = await requireUser(request);
     await requireProfile(request);
 
-    const existing = await db.query.coupleMembers.findFirst({
-      where: eq(coupleMembers.userId, session.user.id),
-    });
-    if (existing) {
-      return fail("Kamu sudah berada dalam sebuah couple", "ALREADY_IN_COUPLE", 400);
-    }
-
     const body = await request.json();
     const data = joinSchema.parse(body);
 
-    const normalizedCode = (data.inviteCode ?? "").trim().toUpperCase();
-    if (!normalizedCode) {
-      return fail("Kode undangan tidak valid", "INVALID_CODE", 404);
-    }
+    const result = await db.transaction(async (tx) => {
+      const existing = await tx.query.coupleMembers.findFirst({
+        where: eq(coupleMembers.userId, session.user.id),
+      });
+      
+      if (existing) {
+        throw new Error("ALREADY_IN_COUPLE");
+      }
 
-    const couple = await db.query.couples.findFirst({
-      where: eq(couples.inviteCode, normalizedCode),
+      const normalizedCode = (data.inviteCode ?? "").trim().toUpperCase();
+      if (!normalizedCode) {
+        throw new Error("INVALID_CODE");
+      }
+
+      const coupleRows = await tx
+        .select()
+        .from(couples)
+        .where(eq(couples.inviteCode, normalizedCode))
+        .for("update");
+        
+      const couple = coupleRows[0];
+      if (!couple) {
+        throw new Error("INVALID_CODE");
+      }
+
+      const memberCountRes = await tx
+        .select({ count: sql`count(*)::int` })
+        .from(coupleMembers)
+        .where(eq(coupleMembers.coupleId, couple.id));
+        
+      const memberCount = Number(memberCountRes[0]?.count ?? 0);
+
+      if (memberCount >= 2) {
+        throw new Error("COUPLE_FULL");
+      }
+
+      await tx.insert(coupleMembers).values({
+        coupleId: couple.id,
+        userId: session.user.id,
+        role: "partner_b",
+      });
+
+      await tx
+        .update(couples)
+        .set({ updatedAt: new Date() })
+        .where(eq(couples.id, couple.id));
+
+      return { coupleId: couple.id, role: "partner_b" };
     });
-    if (!couple) {
+
+    return ok(result);
+  } catch (e: any) {
+    if (e.message === "ALREADY_IN_COUPLE") {
+      return fail("Kamu sudah berada dalam sebuah couple", "ALREADY_IN_COUPLE", 400);
+    }
+    if (e.message === "INVALID_CODE") {
       return fail("Kode undangan tidak valid", "INVALID_CODE", 404);
     }
-
-    const memberCount = await db
-      .select({ count: sql`count(*)::int` })
-      .from(coupleMembers)
-      .where(eq(coupleMembers.coupleId, couple.id))
-      .then((r) => Number(r[0]?.count ?? 0));
-
-    if (memberCount >= 2) {
+    if (e.message === "COUPLE_FULL") {
       return fail("Couple ini sudah lengkap", "COUPLE_FULL", 400);
     }
-
-    await db.insert(coupleMembers).values({
-      coupleId: couple.id,
-      userId: session.user.id,
-      role: "partner_b",
-    });
-
-    await db
-      .update(couples)
-      .set({ updatedAt: new Date() })
-      .where(eq(couples.id, couple.id));
-
-    return ok({ coupleId: couple.id, role: "partner_b" });
-  } catch (e) {
     return handleError(e);
   }
 }

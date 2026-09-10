@@ -8,14 +8,11 @@ import {
   Heart,
   KeyRound,
   Loader2,
-  LogOut,
   Sparkles,
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
@@ -44,7 +41,6 @@ export default function JoinByInvitePage({
   const code = (rawCode ?? "").trim().toUpperCase();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [partnerName, setPartnerName] = useState("");
   const [session, setSession] = useState<{ user: { id: string; name: string } } | null>(null);
   const [currentCouple, setCurrentCouple] = useState<CurrentCouple | null>(null);
   const [preview, setPreview] = useState<InvitePreview | null>(null);
@@ -57,7 +53,6 @@ export default function JoinByInvitePage({
       .then((res) => {
         if (res.data?.user) {
           setSession(res.data as any);
-          setPartnerName(res.data.user.name || "");
         }
       })
       .finally(() => setChecking(false));
@@ -66,7 +61,7 @@ export default function JoinByInvitePage({
   useEffect(() => {
     if (!code) {
       setPreview(null);
-      setPreviewError("Kode undangan kosong");
+      setPreviewError("Kode undangan tidak ditemukan");
       return;
     }
     let cancelled = false;
@@ -79,7 +74,7 @@ export default function JoinByInvitePage({
           setPreviewError(null);
         } else {
           setPreview(null);
-          setPreviewError(res?.error ?? "Kode undangan tidak valid");
+          setPreviewError(res?.error ?? "Kode undangan tidak ditemukan");
         }
       })
       .catch(() => {
@@ -119,34 +114,10 @@ export default function JoinByInvitePage({
 
     setLoading(false);
     if (result.success) {
-      toast.success("Berhasil bergabung!");
+      toast.success("Berhasil bergabung ke dunia kecil kalian ♡");
       router.push("/dashboard");
     } else {
       toast.error(result.error);
-    }
-  };
-
-  const onLeaveAndJoin = async () => {
-    if (!session) return;
-    setLoading(true);
-    const leave = await apiFetch<{ leftCoupleId: string }>("/api/couples/membership", {
-      method: "DELETE",
-    });
-    if (!leave.success) {
-      setLoading(false);
-      toast.error(leave.error);
-      return;
-    }
-    const join = await apiFetch<{ coupleId: string }>("/api/couples/join", {
-      method: "POST",
-      body: JSON.stringify({ inviteCode: code }),
-    });
-    setLoading(false);
-    if (join.success) {
-      toast.success("Berhasil pindah ke couple baru!");
-      router.push("/dashboard");
-    } else {
-      toast.error(join.error);
     }
   };
 
@@ -159,6 +130,27 @@ export default function JoinByInvitePage({
   }
 
   const coupleIsFull = preview?.isFull ?? false;
+  const isAlreadyInThisCouple = currentCouple && preview && currentCouple.inviteCode === code;
+  const isAlreadyInAnotherCouple = currentCouple && preview && currentCouple.inviteCode !== code;
+
+  if (isAlreadyInThisCouple) {
+    return (
+      <div className="min-h-screen bg-background px-6 py-10 md:py-16">
+        <div className="mx-auto max-w-xl space-y-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+            <Heart className="h-7 w-7 heartbeat" fill="currentColor" />
+          </div>
+          <h1 className="font-serif text-3xl tracking-tight">Kamu sudah bergabung!</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Kamu sudah menjadi bagian dari dunia ini ♡
+          </p>
+          <Button size="lg" className="mt-4" asChild>
+            <Link href="/dashboard">Masuk ke Yugma</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background px-6 py-10 md:py-16">
@@ -167,11 +159,11 @@ export default function JoinByInvitePage({
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary">
             <Sparkles className="h-7 w-7" />
           </div>
-          <h1 className="font-serif text-3xl tracking-tight">Kamu diundang!</h1>
+          <h1 className="font-serif text-3xl tracking-tight">Kamu diundang! ♡</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {session
-              ? `Selamat datang ${session.user.name}! Kamu diundang ke dunia kecil pasanganmu.`
-              : "Login dulu untuk bergabung ke dunia kecil pasanganmu."}
+              ? `Selamat datang ${session.user.name}! Siap untuk bergabung?`
+              : "Login untuk bergabung ke dunia kecil yang dibuat untuk kalian berdua."}
           </p>
         </div>
 
@@ -192,8 +184,7 @@ export default function JoinByInvitePage({
                 <div className="flex-1">
                   <p className="font-medium text-rose-900">{previewError}</p>
                   <p className="mt-1 text-rose-800/80">
-                    Pastikan kamu menyalin kode yang benar dari pasanganmu. Jika pasanganmu
-                    regenerate kodenya, minta yang terbaru.
+                    Pastikan kode yang kamu masukkan benar.
                   </p>
                 </div>
               </div>
@@ -204,11 +195,11 @@ export default function JoinByInvitePage({
                 <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
                 <div className="flex-1">
                   <p className="font-medium text-amber-900">
-                    Couple ini sudah lengkap
+                    Kode undangan ini sudah tidak tersedia
                   </p>
                   <p className="mt-1 text-amber-800/80">
-                    Kode undangan ini sudah dipakai oleh dua orang. Minta pasanganmu regenerate
-                    kode baru jika perlu.
+                    2 dari 2 orang sudah bergabung. Minta pasanganmu membuat kode undangan
+                    baru jika kamu ingin bergabung.
                   </p>
                 </div>
               </div>
@@ -219,46 +210,30 @@ export default function JoinByInvitePage({
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" />
                 <div className="flex-1">
                   <p className="font-medium text-emerald-900">
-                    Kode valid
-                    {preview.coupleName ? (
-                      <span className="text-emerald-800/80">
-                        {" "}— {preview.coupleName}
-                      </span>
-                    ) : null}
+                    ✓ Kode valid
                   </p>
                   <p className="mt-1 text-emerald-800/80">
+                    {preview.coupleName ? (
+                      <span className="font-medium block mb-1">
+                        Kamu diundang ke dunia kecil {preview.coupleName}.
+                      </span>
+                    ) : null}
                     {preview.memberCount === 0
                       ? "Belum ada member — kamu yang pertama bergabung."
-                      : "Satu slot tersisa untuk kamu."}
+                      : "1 dari 2 orang sudah bergabung."}
                   </p>
                 </div>
               </div>
             )}
 
-            {!session && (
-              <div className="space-y-2">
-                <Label htmlFor="name">Nama kamu</Label>
-                <Input
-                  id="name"
-                  placeholder="Siapa namamu?"
-                  value={partnerName}
-                  onChange={(e) => setPartnerName(e.target.value)}
-                />
-              </div>
-            )}
-
-            {session && currentCouple && (
-              <div className="rounded-xl border border-amber-300/60 bg-amber-50/60 p-4 text-sm">
-                <p className="font-medium text-amber-900">
-                  Kamu sudah berada dalam couple
+            {session && isAlreadyInAnotherCouple && (
+              <div className="rounded-xl border border-rose-300/60 bg-rose-50/60 p-4 text-sm">
+                <p className="font-medium text-rose-900">
+                  Kamu sudah memiliki couple space
                 </p>
-                <p className="mt-1 text-amber-800/80">
-                  Untuk menerima undangan ini, kamu perlu keluar dari couple
-                  <span className="font-medium">
-                    {" "}
-                    {currentCouple.coupleName ?? "saat ini"}
-                  </span>{" "}
-                  dulu. Data couple lama tetap aman — pasanganmu yang tersisa masih punya akses.
+                <p className="mt-1 text-rose-800/80">
+                  Akun ini sudah menjadi bagian dari couple space lain.
+                  Kamu tidak dapat bergabung ke couple lain dengan akun yang sama.
                 </p>
               </div>
             )}
@@ -275,6 +250,17 @@ export default function JoinByInvitePage({
                   Masukkan kode lain
                 </Link>
               </Button>
+            ) : isAlreadyInAnotherCouple ? (
+              <Button
+                size="lg"
+                className="w-full"
+                asChild
+              >
+                <Link href="/dashboard">
+                  <ArrowRight className="h-4 w-4" />
+                  Kembali ke Yugma
+                </Link>
+              </Button>
             ) : !session ? (
               <Button
                 size="lg"
@@ -288,42 +274,35 @@ export default function JoinByInvitePage({
                 <ArrowRight className="h-4 w-4" />
                 Lanjut ke login
               </Button>
-            ) : currentCouple ? (
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={onLeaveAndJoin}
-                disabled={loading}
-                variant="destructive"
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    <LogOut className="h-4 w-4" />
-                    Keluar & terima undangan
-                  </>
-                )}
-              </Button>
             ) : (
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={onJoin}
-                disabled={loading || !preview}
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    <Heart className="h-4 w-4" fill="currentColor" />
-                    Bergabung sekarang
-                  </>
-                )}
-              </Button>
+              <div className="space-y-4">
+                <div className="rounded-xl bg-primary/5 p-4 text-center">
+                  <p className="text-sm font-medium text-primary">
+                    Bergabung ke dunia kecil kalian ♡
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Kamu akan menjadi anggota {preview?.memberCount === 0 ? "pertama" : "kedua"} dari couple space ini.
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  className="w-full"
+                  onClick={onJoin}
+                  disabled={loading || !preview}
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Heart className="h-4 w-4" fill="currentColor" />
+                      Gabung sekarang
+                    </>
+                  )}
+                </Button>
+              </div>
             )}
 
-            {!session && (
+            {!session && !coupleIsFull && !previewError && (
               <p className="text-center text-xs text-muted-foreground">
                 Belum punya akun?{" "}
                 <Link

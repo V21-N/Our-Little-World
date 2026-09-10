@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, Heart, Lock } from "lucide-react";
 
 export const metadata = {
-  title: "Privasi — Our Little World",
+  title: "Privasi — Yugma",
 };
 
 export default function PrivacyPage() {
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
       <div className="prose prose-stone max-w-none space-y-6 text-foreground/80">
         <p className="text-lg italic text-muted-foreground">
-          Privasi bukan fitur tambahan — itu pondasi Our Little World.
+          Privasi bukan fitur tambahan — itu pondasi Yugma.
         </p>
 
         <section>

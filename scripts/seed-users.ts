@@ -6,8 +6,8 @@ import { profiles } from "../lib/db/schema/profiles";
 import { sql, eq } from "drizzle-orm";
 
 const users = [
-  { email: "alvin@ourlittleworld.app", password: "alvin1234", name: "Alvin Pratama" },
-  { email: "manda@ourlittleworld.app", password: "manda1234", name: "Manda Saputra" },
+  { email: "alvin@yugma.app", password: "alvin1234", name: "Alvin Pratama" },
+  { email: "manda@yugma.app", password: "manda1234", name: "Manda Saputra" },
 ];
 
 async function findUserId(email: string): Promise<string | null> {

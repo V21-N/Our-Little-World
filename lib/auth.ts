@@ -21,13 +21,21 @@ const trustedOrigins = [
   vercelURL,
   "http://localhost:3000",
   "http://127.0.0.1:3000",
-  "https://our-little-world-blond.vercel.app",
+  "https://yugma.vercel.app",
 ].filter((origin, index, origins): origin is string => Boolean(origin) && origins.indexOf(origin) === index);
 
 export const auth = betterAuth({
   baseURL: authBaseURL,
   trustedOrigins,
   secret: process.env.BETTER_AUTH_SECRET,
+  
+  // 1. TAMBAHKAN BLOK INI UNTUK MENGAKTIFKAN HAPUS AKUN
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
+  
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -60,6 +68,7 @@ export const auth = betterAuth({
     },
   },
   advanced: {
-    cookiePrefix: "olw",
+    // 2. SESUAIKAN COOKIE PREFIX DENGAN NAMA BRAND BARU
+    cookiePrefix: "yugma", 
   },
 });

@@ -105,8 +105,7 @@ function InviteContent() {
           <div className="rounded-xl bg-card p-4 text-sm leading-relaxed text-foreground/90">
             <Heart className="mb-2 h-4 w-4 text-primary" fill="currentColor" />
             <p>
-              Hai sayang, aku sudah membuat tempat privat kita berdua di &ldquo;Our Little
-              World&rdquo;. Yuk gabung lewat tautan ini ya:
+              Hai sayang, aku sudah membuat tempat privat kita berdua di &ldquo;Yugma&rdquo;. Yuk gabung lewat tautan ini ya:
             </p>
             <p className="mt-2 font-mono text-xs text-primary">{inviteLink}</p>
           </div>
@@ -115,7 +114,7 @@ function InviteContent() {
             className="w-full"
             onClick={() => {
               const text = encodeURIComponent(
-                `Hai sayang, aku sudah membuat tempat privat kita berdua di "Our Little World". Yuk gabung lewat tautan ini: ${inviteLink}`,
+                `Hai sayang, aku sudah membuat tempat privat kita berdua di "Yugma". Yuk gabung lewat tautan ini: ${inviteLink}`,
               );
               window.open(`https://wa.me/?text=${text}`, "_blank");
             }}

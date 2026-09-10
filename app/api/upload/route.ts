@@ -4,6 +4,9 @@ import { randomUUID } from "crypto";
 import { uploadImage } from "@/lib/storage";
 import sharp from "sharp";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const MAX_SIZE = 8 * 1024 * 1024;
 const ENTITIES = new Set(["memories", "timeline", "letters", "avatars", "couple-covers"]);
 
