@@ -75,7 +75,7 @@ async function runTest() {
           .set({ updatedAt: new Date() })
           .where(eq(couples.id, couple.id));
 
-        return { success: true, userId };
+        return { success: true, userId, error: undefined };
       });
       return result;
     } catch (e: any) {
