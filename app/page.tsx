@@ -228,7 +228,7 @@ export default function Home() {
                   fill
                   priority
                   fetchPriority="high"
-                  sizes="(min-width: 1024px) 1024px, 100vw"
+                  sizes="(min-width: 1024px) 1024px, (min-width: 640px) 80vw, 95vw"
                   className="object-contain object-center transition-transform duration-700 hover:scale-[1.01]"
                 />
             </div>
