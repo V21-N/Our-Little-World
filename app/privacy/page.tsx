@@ -20,7 +20,7 @@ export default function PrivacyPage() {
         <h1 className="font-serif text-3xl tracking-tight">Privasi & Keamanan</h1>
       </div>
 
-      <div className="prose prose-stone max-w-none space-y-6 text-foreground/80">
+      <div className="prose prose-stone max-w-none space-y-6 text-foreground/90">
         <p className="text-lg italic text-muted-foreground">
           Privasi bukan fitur tambahan. Itu pondasi Yugma.
         </p>

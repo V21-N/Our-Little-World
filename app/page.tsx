@@ -222,15 +222,15 @@ export default function Home() {
 
             {/* Container Gambar */}
             <div className="relative aspect-[16/7.7] w-full overflow-hidden rounded-2xl border border-[#EFE6DD] bg-[#FDFBF7] shadow-inner">
-              <Image
-                src="/app-preview.png"
-                alt="Yugma App Preview"
-                fill
-                priority
-                fetchPriority="high"
-                sizes="(min-width: 1024px) 1024px, 100vw"
-                className="object-contain object-center transition-transform duration-700 hover:scale-[1.01]"
-              />
+                <Image
+                  src="/app-preview.webp"
+                  alt="Yugma App Preview"
+                  fill
+                  priority
+                  fetchPriority="high"
+                  sizes="(min-width: 1024px) 1024px, 100vw"
+                  className="object-contain object-center transition-transform duration-700 hover:scale-[1.01]"
+                />
             </div>
           </div>
         </section>

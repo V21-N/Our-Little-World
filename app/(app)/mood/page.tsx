@@ -302,7 +302,7 @@ function MoodCalendar({
                   "flex aspect-square flex-col items-center justify-center rounded-lg text-[10px]",
                   m
                     ? "bg-secondary/40 text-foreground"
-                    : "bg-muted/40 text-muted-foreground/50",
+                    : "bg-muted/40 text-muted-foreground",
                 )}
                 title={d.date}
               >
