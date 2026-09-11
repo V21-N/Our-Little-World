@@ -293,6 +293,7 @@ export default function DashboardPage() {
                       <img
                         src={m.images[0].url}
                         alt={m.caption ?? "Memory"}
+                        loading="lazy"
                         className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                       />
                     )}

@@ -14,7 +14,7 @@ export default function SupportPage() {
 
       <Link
         href="/"
-        className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2B1B22]/60 transition hover:text-[#6B2D39]"
+        className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2B1B22]/70 transition hover:text-[#6B2D39]"
       >
         <ArrowLeft className="h-4 w-4" />
         Kembali ke beranda
