@@ -175,7 +175,7 @@ export default async function Image() {
           }}
         >
           <img
-            src={`${baseUrl}/Yugma-Icon.svg`}
+            src={`${baseUrl}/icon-192.png`}
             alt=""
             width={40}
             height={40}
@@ -265,16 +265,48 @@ export default async function Image() {
               background: "linear-gradient(90deg, transparent, #B97886)",
             }}
           />
-          {/* Heart icon */}
+          {/* Heart icon (CSS-only, avoids dynamic font download) */}
           <div
             style={{
-              fontSize: 20,
-              color: "#B97886",
+              position: "relative",
+              width: 18,
+              height: 16,
               display: "flex",
-              alignItems: "center",
             }}
           >
-            ♡
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: 10,
+                height: 10,
+                borderRadius: 9999,
+                background: "#B97886",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                right: 0,
+                top: 0,
+                width: 10,
+                height: 10,
+                borderRadius: 9999,
+                background: "#B97886",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 4,
+                top: 5,
+                width: 10,
+                height: 10,
+                background: "#B97886",
+                transform: "rotate(45deg)",
+              }}
+            />
           </div>
           {/* Right line */}
           <div
