@@ -2,7 +2,9 @@ import Link from "next/link";
 import { ArrowLeft, Heart, Lock } from "lucide-react";
 
 export const metadata = {
-  title: "Privasi Yugma",
+  title: "Privasi & Keamanan",
+  description:
+    "Data kamu hanya milik kamu berdua. Pelajari bagaimana Yugma menjaga privasi pasangan dengan Row Level Security dan tanpa iklan.",
 };
 
 export default function PrivacyPage() {

@@ -2,6 +2,12 @@ import Link from "next/link";
 import { ArrowLeft, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+export const metadata = {
+  title: "Dukungan",
+  description:
+    "Dukung Yugma untuk terus menjadi ruang privat yang aman dan bebas iklan bagi setiap pasangan.",
+};
+
 export default function SupportPage() {
   return (
     <div className="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#FDFBF7] px-6 py-20 text-[#2B1B22] selection:bg-[#D4A5A5]/30 selection:text-[#6B2D39]">
