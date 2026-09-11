@@ -139,7 +139,7 @@ export default function Home() {
             <YugmaLogo className="h-8 w-auto" color="#6B2D39" />
           </Link>
 
-          <nav className="hidden items-center gap-8 text-sm font-medium text-[#2B1B22]/70 md:flex">
+          <nav className="hidden items-center gap-8 text-sm font-medium text-[#2B1B22]/75 md:flex">
             <a href="#fitur" className="transition hover:text-[#6B2D39]">
               Fitur
             </a>
@@ -180,7 +180,7 @@ export default function Home() {
             </span>
           </h1>
 
-          <p className="mt-6 max-w-2xl text-balance text-base text-[#2B1B22]/70 sm:text-lg md:text-xl font-normal leading-relaxed">
+          <p className="mt-6 max-w-2xl text-balance text-base text-[#2B1B22]/75 sm:text-lg md:text-xl font-normal leading-relaxed">
             Sebuah dunia kecil yang hanya milik kalian, untuk menyimpan kenangan, menulis surat,
             merencanakan mimpi, dan mengingat hal-hal yang terasa penting.
           </p>
@@ -200,7 +200,7 @@ export default function Home() {
             </Button>
           </div>
 
-          <p className="mt-5 flex items-center gap-2 text-xs text-[#2B1B22]/70">
+          <p className="mt-5 flex items-center gap-2 text-xs text-[#2B1B22]/75">
             <Lock className="h-3.5 w-3.5 text-[#6B2D39]" />
             Undangan melalui tautan privat. Tanpa publik. Tanpa like. Tanpa algoritma.
           </p>
@@ -214,7 +214,7 @@ export default function Home() {
                 <div className="h-3 w-3 rounded-full bg-[#D4A5A5]/40" />
                 <div className="h-3 w-3 rounded-full bg-[#EFE6DD]" />
               </div>
-              <span className="text-[11px] font-medium tracking-wide text-[#2B1B22]/70">
+              <span className="text-[11px] font-medium tracking-wide text-[#2B1B22]/75">
                 yugma.app/dashboard
               </span>
               <div className="w-12" />
@@ -245,7 +245,7 @@ export default function Home() {
               <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2B1B22] md:text-5xl">
                 Satu tempat untuk semuanya.
               </h2>
-              <p className="mt-4 text-[#2B1B22]/70 leading-relaxed">
+              <p className="mt-4 text-[#2B1B22]/75 leading-relaxed">
                 Berhenti mencatat kenangan di chat yang hilang. Pindahkan ke tempat yang hangat,
                 terstruktur, dan hanya kalian yang bisa membukanya.
               </p>
@@ -266,12 +266,12 @@ export default function Home() {
                       <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#6B2D39]/10 text-[#6B2D39] transition-colors group-hover:bg-[#6B2D39] group-hover:text-[#FDFBF7]">
                         <feature.icon className="h-5 w-5" />
                       </div>
-                      <span className="text-[10px] font-semibold tracking-wider uppercase text-[#2B1B22]/70 bg-[#EFE6DD]/60 px-2 py-0.5 rounded-full border border-[#EFE6DD]">
+                      <span className="text-[10px] font-semibold tracking-wider uppercase text-[#2B1B22]/75 bg-[#EFE6DD]/60 px-2 py-0.5 rounded-full border border-[#EFE6DD]">
                         {feature.tag}
                       </span>
                     </div>
                     <h3 className="mt-5 font-serif text-xl font-semibold tracking-tight text-[#2B1B22]">{feature.title}</h3>
-                    <p className="mt-2 text-xs leading-relaxed text-[#2B1B22]/70">
+                    <p className="mt-2 text-xs leading-relaxed text-[#2B1B22]/75">
                       {feature.description}
                     </p>
                   </div>
@@ -295,7 +295,7 @@ export default function Home() {
                 <h2 className="mt-5 font-serif text-3xl font-bold tracking-tight text-[#2B1B22] md:text-5xl leading-tight">
                   Privat sampai ke akarnya.
                 </h2>
-                <p className="mt-4 text-base text-[#2B1B22]/70 leading-relaxed">
+                <p className="mt-4 text-base text-[#2B1B22]/75 leading-relaxed">
                   Data pribadi kalian dilindungi dengan Row Level Security, sehingga akses data dibatasi hanya untuk anggota couple space.
                 </p>
 
@@ -314,7 +314,7 @@ export default function Home() {
                       </div>
                     <div>
                       <h3 className="font-medium text-sm text-[#2B1B22]">{point.title}</h3>
-                      <p className="text-xs text-[#2B1B22]/70 mt-0.5">{point.description}</p>
+                      <p className="text-xs text-[#2B1B22]/75 mt-0.5">{point.description}</p>
                     </div>
                     </div>
                   ))}
@@ -442,7 +442,7 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <YugmaLogo className="h-7 w-auto" color="#6B2D39" />
         </div>
-        <p className="max-w-sm text-xs leading-relaxed text-[#2B1B22]/70">
+        <p className="max-w-sm text-xs leading-relaxed text-[#2B1B22]/75">
           Ruang privat eksklusif untuk dua orang. Dirancang untuk menyimpan kenangan, surat, dan cerita bersama tanpa distraksi dunia luar.
         </p>
       </div>
@@ -453,7 +453,7 @@ export default function Home() {
           <p className="text-[11px] font-semibold tracking-wider text-[#6B2D39] uppercase">
             Jelajahi
           </p>
-          <ul className="space-y-2 text-xs font-medium text-[#2B1B22]/70">
+          <ul className="space-y-2 text-xs font-medium text-[#2B1B22]/75">
             <li>
               <a href="#fitur" className="transition hover:text-[#6B2D39]">
                 Fitur Utama
@@ -476,7 +476,7 @@ export default function Home() {
           <p className="text-[11px] font-semibold tracking-wider text-[#6B2D39] uppercase">
             Dukungan
           </p>
-          <ul className="space-y-2 text-xs font-medium text-[#2B1B22]/70">
+          <ul className="space-y-2 text-xs font-medium text-[#2B1B22]/75">
             <li>
               <Link href="/support" className="transition hover:text-[#6B2D39]">
                 Traktir Yugma
@@ -497,7 +497,7 @@ export default function Home() {
           <p className="text-[11px] font-semibold tracking-wider text-[#6B2D39] uppercase">
             Bantuan & Akses
           </p>
-          <ul className="space-y-2 text-xs font-medium text-[#2B1B22]/70">
+          <ul className="space-y-2 text-xs font-medium text-[#2B1B22]/75">
             <li>
               <Link href="/login" className="transition hover:text-[#6B2D39]">
                 Masuk ke Ruang
@@ -514,7 +514,7 @@ export default function Home() {
     </div>
 
     {/* Bottom Bar */}
-    <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#EFE6DD] pt-6 text-xs text-[#2B1B22]/70 sm:flex-row">
+    <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#EFE6DD] pt-6 text-xs text-[#2B1B22]/75 sm:flex-row">
       <p>&copy; {new Date().getFullYear()} Yugma. All rights reserved.</p>
       <p className="flex items-center gap-1.5 text-[11px]">
         Designed for two, built with care <Heart className="h-3 w-3 fill-[#6B2D39] text-[#6B2D39]" />

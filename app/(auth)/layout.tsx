@@ -40,7 +40,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Footer Copyright */}
-        <p className="relative text-xs text-[#2B1B22]/50">
+        <p className="relative text-xs text-[#2B1B22]/75">
           &copy; {new Date().getFullYear()} Yugma. A private space for two
         </p>
 

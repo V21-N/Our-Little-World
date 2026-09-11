@@ -350,7 +350,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label className="text-xs font-semibold uppercase tracking-wider text-[#2B1B22]/70">Email Terdaftar</Label>
-                <Input type="email" value={user.email} disabled className="h-11 rounded-xl border-[#EFE6DD] bg-[#F8F4EE] text-[#2B1B22]/50" />
+                <Input type="email" value={user.email} disabled className="h-11 rounded-xl border-[#EFE6DD] bg-[#F8F4EE] text-[#2B1B22]/75" />
               </div>
             </div>
             <Button onClick={saveProfile} disabled={savingProfile} className="rounded-full bg-[#6B2D39] hover:bg-[#54232C] text-[#FDFBF7]">
