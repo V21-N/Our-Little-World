@@ -62,6 +62,15 @@ export default function MemoryDetailPage({
       .catch(() => setLoading(false));
   }, [id]);
 
+  //Foto akan berganti setiap 3 detik jika ada lebih dari 1 foto
+  useEffect(() => {
+    if (!memory || memory.images.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveImage((prev) => (prev + 1) % memory.images.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [memory, activeImage]);
+
   const toggleFavorite = async () => {
     if (!memory) return;
     const res = await fetch(`/api/memories/${id}`, {
@@ -176,12 +185,13 @@ export default function MemoryDetailPage({
         <div className="space-y-3">
           {memory.images.length > 0 && (
             <>
-              <div className="overflow-hidden rounded-3xl border border-border/60 bg-muted">
+              <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
+                  key={activeImage}
                   src={memory.images[activeImage]?.url}
                   alt={memory.caption ?? "Memory"}
-                  className="aspect-[4/5] w-full object-cover sm:aspect-[4/3]"
+                  className="animate-in fade-in slide-in-from-right-3 duration-700 fill-mode-both aspect-[4/5] w-full object-cover sm:aspect-[4/3]"
                 />
               </div>
               {memory.images.length > 1 && (

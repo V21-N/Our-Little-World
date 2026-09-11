@@ -86,7 +86,7 @@ export default function LetterDetailPage({
     if (json.success) {
       setOpened(true);
       setLetter(json.data);
-      toast.success("Surat dibuka — semoga harimu lebih baik 💌");
+      toast.success("Surat dibuka. Semoga harimu lebih baik 💌");
     } else {
       toast.error(json.error);
     }

@@ -109,6 +109,13 @@ export default function StoryPage() {
                     {event.description}
                   </p>
                 )}
+                {event.imageUrl && (
+                  <img
+                    src={event.imageUrl}
+                    alt={event.title}
+                    className="mt-3 w-full rounded-xl object-cover"
+                  />
+                )}
               </CardContent>
             </Card>
           </li>

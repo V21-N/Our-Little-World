@@ -5,19 +5,18 @@ import {
   CalendarDays,
   Heart,
   Lock,
-  Mail,
   MessageCircleHeart,
   Star,
   Trophy,
   ShieldCheck,
   EyeOff,
   BellOff,
-  ArrowRight,
   Music,
   HelpCircle,
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/reveal";
 import { Badge } from "@/components/ui/badge";
 import { FloatingHearts } from "@/components/floating-hearts";
 
@@ -55,7 +54,7 @@ const features = [
   {
     icon: MessageCircleHeart,
     title: "Love Letters",
-    description: "Surat digital dengan jadwal buka — untuk dibaca di saat yang tepat berdua.",
+    description: "Surat digital dengan jadwal buka untuk dibaca di saat yang tepat berdua.",
     tag: "Pesan Waktu",
   },
   {
@@ -91,7 +90,7 @@ const features = [
   {
     icon: Trophy,
     title: "Achievements",
-    description: "Buka lencana kecil dari aktivitas kalian — pengingat manis dari setiap langkah bersama.",
+    description: "Buka lencana kecil dari aktivitas kalian sebagai pengingat manis dari setiap langkah bersama.",
     tag: "Pencapaian",
   },
 ];
@@ -100,7 +99,7 @@ const privacyPoints = [
   {
     icon: ShieldCheck,
     title: "Hanya Dua Akun",
-    description: "Bukan aplikasi publik — khusus satu ruang eksklusif untuk satu pasangan.",
+    description: "Bukan aplikasi publik. Khusus satu ruang eksklusif untuk satu pasangan.",
   },
   {
     icon: EyeOff,
@@ -150,6 +149,9 @@ export default function Home() {
             <a href="#cerita" className="transition hover:text-[#6B2D39]">
               Cerita
             </a>
+            <a href="#filosofi" className="transition hover:text-[#6B2D39]">
+              Filosofi
+            </a>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -179,7 +181,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-balance text-base text-[#2B1B22]/70 sm:text-lg md:text-xl font-normal leading-relaxed">
-            Sebuah dunia kecil yang hanya milik kalian — untuk menyimpan kenangan, menulis surat,
+            Sebuah dunia kecil yang hanya milik kalian, untuk menyimpan kenangan, menulis surat,
             merencanakan mimpi, dan mengingat hal-hal yang terasa penting.
           </p>
 
@@ -232,127 +234,204 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section id="fitur" className="mt-32">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="soft" className="mb-3 rounded-full bg-[#D4A5A5]/20 text-[#6B2D39] border border-[#D4A5A5]/40">
-              Ruang Kebersamaan
-            </Badge>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2B1B22] md:text-5xl">
-              Satu tempat untuk semuanya.
-            </h2>
-            <p className="mt-4 text-[#2B1B22]/70 leading-relaxed">
-              Berhenti mencatat kenangan di chat yang hilang. Pindahkan ke tempat yang hangat,
-              terstruktur, dan hanya kalian yang bisa membukanya.
-            </p>
-          </div>
-
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((feature, i) => (
-              <div
-                key={feature.title}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#EFE6DD] bg-[#F8F4EE]/60 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#D4A5A5] hover:shadow-xl hover:shadow-[#6B2D39]/5 backdrop-blur-sm"
-                style={{
-                  animationDelay: `${i * 80}ms`,
-                  animation: "fade-in 0.6s ease-out both",
-                }}
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#6B2D39]/10 text-[#6B2D39] transition-colors group-hover:bg-[#6B2D39] group-hover:text-[#FDFBF7]">
-                      <feature.icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-[10px] font-semibold tracking-wider uppercase text-[#2B1B22]/60 bg-[#EFE6DD]/60 px-2 py-0.5 rounded-full border border-[#EFE6DD]">
-                      {feature.tag}
-                    </span>
-                  </div>
-                  <h3 className="mt-5 font-serif text-xl font-semibold tracking-tight text-[#2B1B22]">{feature.title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-[#2B1B22]/70">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Privacy Section */}
-        <section id="privasi" className="mt-32 rounded-3xl border border-[#EFE6DD] bg-gradient-to-b from-[#F8F4EE] via-[#F8F4EE]/50 to-[#FDFBF7] p-8 md:p-14 backdrop-blur-xl relative overflow-hidden">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#6B2D39]/10 blur-3xl pointer-events-none" />
-
-          <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-6">
-              <Badge variant="default" className="gap-1.5 rounded-full bg-[#6B2D39] text-[#FDFBF7] px-3.5 py-1">
-                <Lock className="h-3.5 w-3.5" />
-                Private by Default
+        <Reveal>
+          <section id="fitur" className="mt-32">
+            <div className="mx-auto max-w-2xl text-center">
+              <Badge variant="soft" className="mb-3 rounded-full bg-[#D4A5A5]/20 text-[#6B2D39] border border-[#D4A5A5]/40">
+                Ruang Kebersamaan
               </Badge>
-              <h2 className="mt-5 font-serif text-3xl font-bold tracking-tight text-[#2B1B22] md:text-5xl leading-tight">
-                Privat sampai ke akarnya.
+              <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2B1B22] md:text-5xl">
+                Satu tempat untuk semuanya.
               </h2>
-              <p className="mt-4 text-base text-[#2B1B22]/70 leading-relaxed">
-                Data pribadi kalian dilindungi dengan Row Level Security, sehingga akses data dibatasi hanya untuk anggota couple space.
+              <p className="mt-4 text-[#2B1B22]/70 leading-relaxed">
+                Berhenti mencatat kenangan di chat yang hilang. Pindahkan ke tempat yang hangat,
+                terstruktur, dan hanya kalian yang bisa membukanya.
               </p>
-
-              <div className="mt-8 space-y-4">
-                {privacyPoints.map((point, i) => (
-                  <div
-                    key={point.title}
-                    className="flex items-start gap-4 rounded-2xl border border-[#EFE6DD] bg-[#FDFBF7]/80 p-4 transition hover:border-[#D4A5A5]"
-                    style={{
-                      animationDelay: `${i * 120}ms`,
-                      animation: "fade-in 0.6s ease-out both",
-                    }}
-                  >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6B2D39]/10 text-[#6B2D39]">
-                      <point.icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-sm text-[#2B1B22]">{point.title}</h4>
-                      <p className="text-xs text-[#2B1B22]/70 mt-0.5">{point.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            {/* Interactive Grid Art Display */}
-            <div className="lg:col-span-6">
-              <div className="relative aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B2D39]/20 via-[#D4A5A5]/20 to-[#EFE6DD] p-2 shadow-inner">
-                <div className="grid h-full w-full grid-cols-3 gap-3 rounded-[1.3rem] bg-[#FDFBF7]/90 p-5 backdrop-blur">
-                  {Array.from({ length: 9 }).map((_, i) => (
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {features.map((feature, i) => (
+                <div
+                  key={feature.title}
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#EFE6DD] bg-[#F8F4EE]/60 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#D4A5A5] hover:shadow-xl hover:shadow-[#6B2D39]/5 backdrop-blur-sm"
+                  style={{
+                    animationDelay: `${i * 80}ms`,
+                    animation: "fade-in 0.6s ease-out both",
+                  }}
+                >
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#6B2D39]/10 text-[#6B2D39] transition-colors group-hover:bg-[#6B2D39] group-hover:text-[#FDFBF7]">
+                        <feature.icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-[10px] font-semibold tracking-wider uppercase text-[#2B1B22]/60 bg-[#EFE6DD]/60 px-2 py-0.5 rounded-full border border-[#EFE6DD]">
+                        {feature.tag}
+                      </span>
+                    </div>
+                    <h3 className="mt-5 font-serif text-xl font-semibold tracking-tight text-[#2B1B22]">{feature.title}</h3>
+                    <p className="mt-2 text-xs leading-relaxed text-[#2B1B22]/70">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </Reveal>
+
+        {/* Privacy Section */}
+        <Reveal>
+          <section id="privasi" className="mt-32 rounded-3xl border border-[#EFE6DD] bg-gradient-to-b from-[#F8F4EE] via-[#F8F4EE]/50 to-[#FDFBF7] p-8 md:p-14 backdrop-blur-xl relative overflow-hidden">
+            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#6B2D39]/10 blur-3xl pointer-events-none" />
+
+            <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+              <div className="lg:col-span-6">
+                <Badge variant="default" className="gap-1.5 rounded-full bg-[#6B2D39] text-[#FDFBF7] px-3.5 py-1">
+                  <Lock className="h-3.5 w-3.5" />
+                  Private by Default
+                </Badge>
+                <h2 className="mt-5 font-serif text-3xl font-bold tracking-tight text-[#2B1B22] md:text-5xl leading-tight">
+                  Privat sampai ke akarnya.
+                </h2>
+                <p className="mt-4 text-base text-[#2B1B22]/70 leading-relaxed">
+                  Data pribadi kalian dilindungi dengan Row Level Security, sehingga akses data dibatasi hanya untuk anggota couple space.
+                </p>
+
+                <div className="mt-8 space-y-4">
+                  {privacyPoints.map((point, i) => (
                     <div
-                      key={i}
-                      className={`relative overflow-hidden rounded-2xl transition-all duration-500 ${
-                        i % 2 === 0 ? "bg-[#6B2D39]/10" : "bg-[#D4A5A5]/20"
-                      } ${i === 4 ? "ring-2 ring-[#6B2D39]/50 shadow-lg shadow-[#6B2D39]/15" : "hover:scale-95"}`}
+                      key={point.title}
+                      className="flex items-start gap-4 rounded-2xl border border-[#EFE6DD] bg-[#FDFBF7]/80 p-4 transition hover:border-[#D4A5A5]"
+                      style={{
+                        animationDelay: `${i * 120}ms`,
+                        animation: "fade-in 0.6s ease-out both",
+                      }}
                     >
-                      {i === 4 && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-[#6B2D39]/10">
-                          <Heart className="h-10 w-10 text-[#6B2D39] heartbeat fill-[#6B2D39]" />
-                        </div>
-                      )}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6B2D39]/10 text-[#6B2D39]">
+                        <point.icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm text-[#2B1B22]">{point.title}</h4>
+                        <p className="text-xs text-[#2B1B22]/70 mt-0.5">{point.description}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* Interactive Grid Art Display */}
+              <div className="lg:col-span-6">
+                <div className="relative aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B2D39]/20 via-[#D4A5A5]/20 to-[#EFE6DD] p-2 shadow-inner">
+                  <div className="grid h-full w-full grid-cols-3 gap-3 rounded-[1.3rem] bg-[#FDFBF7]/90 p-5 backdrop-blur">
+                    {Array.from({ length: 9 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`relative overflow-hidden rounded-2xl transition-all duration-500 ${
+                          i % 2 === 0 ? "bg-[#6B2D39]/10" : "bg-[#D4A5A5]/20"
+                        } ${i === 4 ? "ring-2 ring-[#6B2D39]/50 shadow-lg shadow-[#6B2D39]/15" : "hover:scale-95"}`}
+                      >
+                        {i === 4 && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-[#6B2D39]/10">
+                            <Heart className="h-10 w-10 text-[#6B2D39] heartbeat fill-[#6B2D39]" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </Reveal>
 
         {/* Quote Section */}
-        <section id="cerita" className="mt-32 text-center">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-[#D4A5A5]/40 bg-[#6B2D39]/5 px-6 py-16 backdrop-blur">
-            <p className="font-serif text-2xl font-medium italic text-[#2B1B22] md:text-4xl leading-snug">
-              &ldquo;Bukan soal fitur. Ini soal{" "}
-              <span className="text-[#6B2D39] font-bold inline-flex items-center gap-1">
-                tempat <Heart className="h-6 w-6 heartbeat fill-[#6B2D39] text-[#6B2D39]" />
-              </span>{" "}
-              pulang.&rdquo;
-            </p>
-          </div>
-        </section>
+        <Reveal>
+          <section id="cerita" className="mt-32 text-center">
+            <div className="mx-auto max-w-3xl rounded-3xl border border-[#D4A5A5]/40 bg-[#6B2D39]/5 px-6 py-16 backdrop-blur">
+              <p className="font-serif text-2xl font-medium italic text-[#2B1B22] md:text-4xl leading-snug">
+                &ldquo;Bukan soal fitur. Ini soal{" "}
+                <span className="text-[#6B2D39] font-bold inline-flex items-center gap-1">
+                  tempat <Heart className="h-6 w-6 heartbeat fill-[#6B2D39] text-[#6B2D39]" />
+                </span>{" "}
+                pulang.&rdquo;
+              </p>
+            </div>
+          </section>
+        </Reveal>
+
+        {/* Filosofi Section */}
+        <Reveal>
+          <section id="filosofi" className="mt-32">
+            <div className="relative overflow-hidden rounded-3xl border border-[#EFE6DD] bg-gradient-to-br from-[#FDFBF7] via-[#F8F4EE]/70 to-[#FDFBF7] p-8 backdrop-blur-xl md:p-14">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#D4A5A5]/60 to-transparent" />
+              <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[#6B2D39]/10 blur-3xl pointer-events-none" />
+              <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#D4A5A5]/20 blur-3xl pointer-events-none" />
+
+              <div className="relative grid items-center gap-12 lg:grid-cols-12">
+                {/* Teks Filosofi */}
+                <div className="lg:col-span-7">
+                  <Badge variant="soft" className="mb-4 rounded-full bg-[#D4A5A5]/20 text-[#6B2D39] border border-[#D4A5A5]/40">
+                    Filosofi Yugma
+                  </Badge>
+                  <h2 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[#2B1B22] md:text-5xl">
+                    Dua pribadi.
+                    <br />
+                    <span className="bg-gradient-to-r from-[#6B2D39] via-[#8C4351] to-[#D4A5A5] bg-clip-text text-transparent">
+                      Satu ikatan.
+                    </span>
+                  </h2>
+
+                  <div className="mt-6 space-y-5 text-sm leading-relaxed text-[#2B1B22]/75 md:text-base">
+                    <p>
+                      <strong className="font-semibold text-[#6B2D39]">Yugma</strong> berasal dari
+                      bahasa Sanskerta yang berarti <em className="font-serif text-[#6B2D39]">pasangan</em>{" "}
+                      &mdash; dua hal yang berdampingan dan membentuk sebuah kesatuan.
+                    </p>
+                    <p>
+                      Logo Yugma menggambarkan{" "}
+                      <strong className="font-semibold text-[#2B1B22]">
+                        dua individu yang berbeda, dipertemukan oleh cinta dan terhubung dalam satu ikatan
+                      </strong>
+                      . Dua sosok dengan bentuk dan warna yang berbeda tetap mempertahankan identitasnya
+                      masing-masing, namun saling beririsan dan membentuk satu kesatuan yang utuh.
+                    </p>
+                    <p>
+                      Karena pada akhirnya, mencintai bukan berarti kehilangan diri sendiri untuk menjadi
+                      satu. Melainkan{" "}
+                      <strong className="font-semibold text-[#6B2D39]">
+                        tetap menjadi diri sendiri, sambil memilih untuk berjalan bersama
+                      </strong>
+                      .
+                    </p>
+                  </div>
+
+                  <div className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-[#D4A5A5]/40 bg-[#6B2D39]/5 px-6 py-4">
+                    <Heart className="h-5 w-5 heartbeat fill-[#6B2D39] text-[#6B2D39]" />
+                    <p className="font-serif text-lg font-semibold tracking-wide text-[#6B2D39] md:text-xl">
+                      Dua pribadi. Satu ikatan. Satu perjalanan.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Visual Logo Yugma */}
+                <div className="lg:col-span-5">
+                  <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-[#6B2D39]/10 via-[#D4A5A5]/15 to-[#F8F4EE] shadow-inner p-8">
+                    <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#6B2D39]/10 blur-2xl pointer-events-none" />
+                    <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-[#D4A5A5]/20 blur-2xl pointer-events-none" />
+                    <img
+                      src="/Yugma-Icon.svg"
+                      alt="Yugma Logo"
+                      className="h-44 w-44 sm:h-56 sm:w-56 heartbeat object-contain mix-blend-multiply drop-shadow-md"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </Reveal>
       </main>
 
-      {/* Footer */}
+{/* Footer */}
 <footer className="relative border-t border-[#EFE6DD] bg-[#F8F4EE]/60 backdrop-blur-md">
   <div className="mx-auto max-w-6xl px-6 py-12">
     <div className="grid gap-8 md:grid-cols-12 md:gap-12">
@@ -384,13 +463,34 @@ export default function Home() {
               </a>
             </li>
             <li>
-              <a href="#cerita" className="transition hover:text-[#6B2D39]">
+              <a href="#filosofi" className="transition hover:text-[#6B2D39]">
                 Filosofi
               </a>
             </li>
           </ul>
         </div>
 
+        <div className="space-y-2.5">
+          <p className="text-[11px] font-semibold tracking-wider text-[#6B2D39] uppercase">
+            Dukungan
+          </p>
+          <ul className="space-y-2 text-xs font-medium text-[#2B1B22]/70">
+            <li>
+              <Link href="/support" className="transition hover:text-[#6B2D39]">
+                Traktir Yugma
+              </Link>
+            </li>
+            <li>
+              <span className="inline-flex items-center gap-1.5">
+                Kontak Kami
+                <span className="text-[9px] font-semibold uppercase tracking-wider text-[#6B2D39] bg-[#D4A5A5]/20 px-1.5 py-0.5 rounded-full border border-[#D4A5A5]/40">
+                  Segera hadir
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+        
         <div className="space-y-2.5">
           <p className="text-[11px] font-semibold tracking-wider text-[#6B2D39] uppercase">
             Bantuan & Akses
@@ -405,16 +505,7 @@ export default function Home() {
               <Link href="/privacy" className="transition hover:text-[#6B2D39]">
                 Kebijakan Privasi
               </Link>
-            </li>
-            <li>
-              <a
-                href="mailto:hi@yugma.web.id"
-                className="inline-flex items-center gap-1.5 transition hover:text-[#6B2D39]"
-              >
-                <Mail className="h-3.5 w-3.5" />
-                Kontak Kami
-              </a>
-            </li>
+            </li> 
           </ul>
         </div>
       </div>

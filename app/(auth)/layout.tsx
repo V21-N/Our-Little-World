@@ -41,7 +41,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         {/* Footer Copyright */}
         <p className="relative text-xs text-[#2B1B22]/50">
-          &copy; {new Date().getFullYear()} Yugma — A private space for two
+          &copy; {new Date().getFullYear()} Yugma. A private space for two
         </p>
 
         {/* Ambient Decorative Blurs */}

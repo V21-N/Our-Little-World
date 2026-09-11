@@ -250,7 +250,7 @@ export default function DashboardPage() {
                   <AvatarFallback>{initials(profile.fullName)}</AvatarFallback>
                 </Avatar>
                 <span className="text-xl">
-                  {data?.todayMoodMe ? moodEmoji(data.todayMoodMe.mood) : "—"}
+                  {data?.todayMoodMe ? moodEmoji(data.todayMoodMe.mood) : "-"}
                 </span>
               </div>
               <div className="flex flex-col items-center gap-1">
@@ -258,7 +258,7 @@ export default function DashboardPage() {
                   <AvatarFallback>{initials("Pasangan")}</AvatarFallback>
                 </Avatar>
                 <span className="text-xl">
-                  {data?.todayMoodPartner ? moodEmoji(data.todayMoodPartner.mood) : "—"}
+                  {data?.todayMoodPartner ? moodEmoji(data.todayMoodPartner.mood) : "-"}
                 </span>
               </div>
             </div>

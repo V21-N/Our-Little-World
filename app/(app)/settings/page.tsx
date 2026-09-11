@@ -401,7 +401,7 @@ export default function SettingsPage() {
                   <p className="font-medium text-[#2B1B22]">Pasanganmu</p>
                   <p className="text-xs text-[#2B1B22]/60 mt-0.5">
                     Bergabung sejak{" "}
-                    {couple.createdAt ? formatDate(couple.createdAt, { day: "numeric", month: "long", year: "numeric" }) : "—"}
+                    {couple.createdAt ? formatDate(couple.createdAt, { day: "numeric", month: "long", year: "numeric" }) : "-"}
                   </p>
                 </div>
                 <Badge className="bg-[#6B2D39]/10 text-[#6B2D39] hover:bg-[#6B2D39]/20 border-none shadow-none">Aktif</Badge>

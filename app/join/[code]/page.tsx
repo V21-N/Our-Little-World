@@ -219,7 +219,7 @@ export default function JoinByInvitePage({
                       </span>
                     ) : null}
                     {preview.memberCount === 0
-                      ? "Belum ada member — kamu yang pertama bergabung."
+                      ? "Belum ada member. Kamu yang pertama bergabung."
                       : "1 dari 2 orang sudah bergabung."}
                   </p>
                 </div>

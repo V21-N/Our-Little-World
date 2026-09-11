@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Yugma — Tempat Privat Kita Berdua",
+  title: "Yugma: Tempat Privat Kita Berdua",
   description:
     "Ruang digital tertutup untuk menyimpan kenangan, cerita, dan rencana bersama pasangan.",
   manifest: "/manifest.json",

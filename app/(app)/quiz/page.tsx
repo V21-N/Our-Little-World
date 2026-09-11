@@ -277,7 +277,7 @@ export default function QuizPage() {
                   <p className="font-medium">{r.question}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Jawabanmu: {r.options[r.chosen]}{" "}
-                    {r.chosen === r.correct ? "✅" : `— seharusnya: ${r.options[r.correct]} ❌`}
+                    {r.chosen === r.correct ? "✅" : `seharusnya: ${r.options[r.correct]} ❌`}
                   </p>
                 </div>
               ))}

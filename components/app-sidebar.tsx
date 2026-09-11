@@ -28,7 +28,7 @@ export function AppSidebar() {
   const avatarUrl = profile?.avatarUrl || undefined;
 
   return (
-    <aside className="relative hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
+    <aside className="relative sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-primary/8 to-transparent"
