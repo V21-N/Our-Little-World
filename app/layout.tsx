@@ -51,7 +51,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         )}
         <link rel="preconnect" href="https://i.ytimg.com" />
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
-        <link rel="preload" as="image" href="/app-preview.webp" fetchPriority="high" />
       </head>
       <body className="min-h-full bg-background font-sans text-foreground">
         {children}
