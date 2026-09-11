@@ -200,7 +200,7 @@ export default function Home() {
             </Button>
           </div>
 
-          <p className="mt-5 flex items-center gap-2 text-xs text-[#2B1B22]/60">
+          <p className="mt-5 flex items-center gap-2 text-xs text-[#2B1B22]/70">
             <Lock className="h-3.5 w-3.5 text-[#6B2D39]" />
             Undangan melalui tautan privat. Tanpa publik. Tanpa like. Tanpa algoritma.
           </p>
@@ -214,7 +214,7 @@ export default function Home() {
                 <div className="h-3 w-3 rounded-full bg-[#D4A5A5]/40" />
                 <div className="h-3 w-3 rounded-full bg-[#EFE6DD]" />
               </div>
-              <span className="text-[11px] font-medium tracking-wide text-[#2B1B22]/50">
+              <span className="text-[11px] font-medium tracking-wide text-[#2B1B22]/70">
                 yugma.app/dashboard
               </span>
               <div className="w-12" />
@@ -266,7 +266,7 @@ export default function Home() {
                       <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#6B2D39]/10 text-[#6B2D39] transition-colors group-hover:bg-[#6B2D39] group-hover:text-[#FDFBF7]">
                         <feature.icon className="h-5 w-5" />
                       </div>
-                      <span className="text-[10px] font-semibold tracking-wider uppercase text-[#2B1B22]/60 bg-[#EFE6DD]/60 px-2 py-0.5 rounded-full border border-[#EFE6DD]">
+                      <span className="text-[10px] font-semibold tracking-wider uppercase text-[#2B1B22]/70 bg-[#EFE6DD]/60 px-2 py-0.5 rounded-full border border-[#EFE6DD]">
                         {feature.tag}
                       </span>
                     </div>
@@ -434,7 +434,7 @@ export default function Home() {
       </main>
 
 {/* Footer */}
-<footer className="relative border-t border-[#EFE6DD] bg-[#F8F4EE]/60 backdrop-blur-md">
+<footer className="relative cv-auto border-t border-[#EFE6DD] bg-[#F8F4EE]/60 backdrop-blur-md">
   <div className="mx-auto max-w-6xl px-6 py-12">
     <div className="grid gap-8 md:grid-cols-12 md:gap-12">
       {/* Brand & Tagline */}
@@ -514,7 +514,7 @@ export default function Home() {
     </div>
 
     {/* Bottom Bar */}
-    <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#EFE6DD] pt-6 text-xs text-[#2B1B22]/60 sm:flex-row">
+    <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#EFE6DD] pt-6 text-xs text-[#2B1B22]/70 sm:flex-row">
       <p>&copy; {new Date().getFullYear()} Yugma. All rights reserved.</p>
       <p className="flex items-center gap-1.5 text-[11px]">
         Designed for two, built with care <Heart className="h-3 w-3 fill-[#6B2D39] text-[#6B2D39]" />
