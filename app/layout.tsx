@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { PwaRegister } from "@/components/pwa-register";
 
 const geistSans = Geist({
@@ -55,11 +54,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link rel="preload" as="image" href="/app-preview.webp" fetchPriority="high" />
       </head>
       <body className="min-h-full bg-background font-sans text-foreground">
-        <TooltipProvider delayDuration={150}>
-          {children}
-          <Toaster />
-          <PwaRegister />
-        </TooltipProvider>
+        {children}
+        <Toaster />
+        <PwaRegister />
       </body>
     </html>
   );
