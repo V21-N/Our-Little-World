@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+      : "https://our-little-world-blond.vercel.app",
   ),
   openGraph: {
     type: "website",
