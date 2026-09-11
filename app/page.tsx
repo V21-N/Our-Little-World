@@ -226,8 +226,10 @@ export default function Home() {
                 src="/app-preview.png"
                 alt="Yugma App Preview"
                 fill
-                className="object-contain object-center transition-transform duration-700 hover:scale-[1.01]"
                 priority
+                fetchPriority="high"
+                sizes="(min-width: 1024px) 1024px, 100vw"
+                className="object-contain object-center transition-transform duration-700 hover:scale-[1.01]"
               />
             </div>
           </div>
@@ -310,10 +312,10 @@ export default function Home() {
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6B2D39]/10 text-[#6B2D39]">
                         <point.icon className="h-5 w-5" />
                       </div>
-                      <div>
-                        <h4 className="font-medium text-sm text-[#2B1B22]">{point.title}</h4>
-                        <p className="text-xs text-[#2B1B22]/70 mt-0.5">{point.description}</p>
-                      </div>
+                    <div>
+                      <h3 className="font-medium text-sm text-[#2B1B22]">{point.title}</h3>
+                      <p className="text-xs text-[#2B1B22]/70 mt-0.5">{point.description}</p>
+                    </div>
                     </div>
                   ))}
                 </div>

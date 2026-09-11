@@ -29,7 +29,7 @@
   --color-secondary-foreground: #3B2533;
 
   --color-muted: #F3E8E6;
-  --color-muted-foreground: #806F76;
+  --color-muted-foreground: #6F5E66;
 
   --color-accent: #B97886;
   --color-accent-foreground: #3B2533;
@@ -65,6 +65,11 @@
   html {
     scroll-behavior: smooth;
   }
+}
+
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
 }
 
 @layer utilities {
