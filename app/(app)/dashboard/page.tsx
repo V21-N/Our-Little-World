@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ROMANTIC_MESSAGES } from "@/lib/constants";
 import { cn, formatDate, initials, timeAgo } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { useNotifications } from "@/lib/hooks/use-notifications";
 import { apiFetch } from "@/lib/api/client";
 import type { Memory, LoveLetter, TimelineEvent, DailyMood, Achievement } from "@/lib/types";
 
@@ -59,6 +60,7 @@ const romanticMessage =
 
 export default function DashboardPage() {
   const { profile, couple } = useAuth();
+  const { tick } = useNotifications();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,7 +68,7 @@ export default function DashboardPage() {
     const load = async () => {
       const [memoriesRes, lettersRes, bucketRes, moodRes, timelineRes, achievementRes] =
         await Promise.all([
-          apiFetch<{ items: Memory[] }>("/api/memories?limit=4"),
+          apiFetch<{ items: Memory[] }>("/api/memories?limit=4", { revalidate: true }),
           apiFetch<LoveLetter[]>("/api/letters"),
           apiFetch<{
             items: unknown[];
@@ -119,7 +121,7 @@ export default function DashboardPage() {
       setLoading(false);
     };
     load();
-  }, [couple?.id]);
+  }, [couple?.id, tick]);
 
   if (!couple || !profile) return null;
 

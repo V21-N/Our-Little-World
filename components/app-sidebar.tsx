@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { initials } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { useNotifications } from "@/lib/hooks/use-notifications";
 import { primaryNav, secondaryNav } from "@/lib/nav";
 import { usePathname } from "next/navigation";
 
@@ -21,9 +22,25 @@ function YugmaLogoIcon({ className = "h-full w-full" }: { className?: string; co
   );
 }
 
+function NavBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+function badgeCountFor(href: string, summary: { unreadLetters: number; newAchievements: number }) {
+  if (href === "/letters") return summary.unreadLetters;
+  if (href === "/achievements") return summary.newAchievements;
+  return 0;
+}
+
 export function AppSidebar() {
   const pathname = usePathname();
   const { profile, user } = useAuth();
+  const { summary } = useNotifications();
   const displayName = profile?.fullName || user?.name || "User";
   const avatarUrl = profile?.avatarUrl || undefined;
 
@@ -74,6 +91,7 @@ export function AppSidebar() {
                   {active && (
                     <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary heartbeat" />
                   )}
+                  <NavBadge count={badgeCountFor(item.href, summary)} />
                 </Link>
               </li>
             );
@@ -111,6 +129,7 @@ export function AppSidebar() {
                     )}
                   />
                   {item.title}
+                  <NavBadge count={badgeCountFor(item.href, summary)} />
                 </Link>
               </li>
             );

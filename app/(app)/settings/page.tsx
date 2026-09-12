@@ -16,6 +16,7 @@ import {
   User,
   UserMinus,
   Heart,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,6 +36,7 @@ import {
 import { formatDate, initials } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth, type CurrentProfile } from "@/lib/hooks/use-auth";
+import { useTheme } from "@/lib/hooks/use-theme";
 import { authClient } from "@/lib/auth-client";
 import { uploadFile } from "@/lib/api/client";
 import { apiFetch } from "@/lib/api/client";
@@ -42,6 +44,7 @@ import { apiFetch } from "@/lib/api/client";
 export default function SettingsPage() {
   const router = useRouter();
   const { profile, couple, user, refresh, signOut } = useAuth();
+  const { dark, toggle } = useTheme();
   const [copied, setCopied] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showLeave, setShowLeave] = useState(false);
@@ -282,6 +285,20 @@ export default function SettingsPage() {
           Atur identitasmu, detail ruang Yugma, dan preferensi akun.
         </p>
       </header>
+
+      {/* SECTION 0: TAMPILAN */}
+      <section className="mb-8">
+        <SectionHeader icon={Moon} title="Tampilan" />
+        <Card className="rounded-3xl border border-[#EFE6DD] bg-[#FDFBF7] shadow-sm">
+          <CardContent className="flex items-center justify-between pt-6">
+            <div>
+              <p className="font-medium text-[#2B1B22]">Mode Gelap</p>
+              <p className="text-sm text-[#2B1B22]/60">Nyaman untuk mata saat malam hari.</p>
+            </div>
+            <Switch checked={dark} onCheckedChange={toggle} aria-label="Toggle dark mode" />
+          </CardContent>
+        </Card>
+      </section>
 
       {/* SECTION 1: PROFIL */}
       <section className="mb-8">

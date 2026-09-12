@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { initials } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { useNotifications } from "@/lib/hooks/use-notifications";
 import { allNav } from "@/lib/nav";
 import type { Achievement, LoveLetter, Memory } from "@/lib/types";
 
@@ -21,6 +22,7 @@ interface SearchResults {
 export function MobileHeader() {
   const pathname = usePathname();
   const { profile, user } = useAuth();
+  const { summary } = useNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -154,8 +156,10 @@ export function MobileHeader() {
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon-sm" className="relative" aria-label="Notifications">
               <Bell className="h-4 w-4" />
-              {(unreadLetters.length > 0 || unlockedAchievements.length > 0) && (
-                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary heartbeat" />
+              {summary.total > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-semibold text-primary-foreground">
+                  {summary.total > 99 ? "99+" : summary.total}
+                </span>
               )}
             </Button>
           </PopoverTrigger>
