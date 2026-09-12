@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn, initials } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { useCoupleActivity } from "@/lib/hooks/use-couple-activities";
 
@@ -108,72 +108,151 @@ export function ChatDrawer({
   open: boolean;
   onClose: () => void;
 }) {
-  const { messages, messageLoading, sendMessage, loadMessages } = useCoupleActivity();
+  const { messages, messageLoading, sendMessage, loadMessages, presence } = useCoupleActivity();
   const { profile } = useAuth();
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const myId = profile?.id;
 
   useEffect(() => {
     if (open) {
       loadMessages();
-      window.setTimeout(() => inputRef.current?.focus(), 150);
+      window.setTimeout(() => inputRef.current?.focus(), 200);
     }
   }, [open, loadMessages]);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages, open]);
 
   const submit = async () => {
-    if (!draft.trim()) return;
+    const text = draft.trim();
+    if (!text || sending) return;
     setSending(true);
-    await sendMessage(draft);
+    await sendMessage(text);
     setDraft("");
     setSending(false);
   };
 
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void submit();
+    }
+  };
+
+  const resizeInput = () => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  };
+
   if (!open) return null;
 
+  let lastDayKey = "";
+
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40">
-      <div className="flex h-full w-[min(24rem,100vw)] animate-in slide-in-from-right-3 fill-mode-both flex-col bg-background shadow-xl">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 className="font-serif text-lg">Chat berdua</h2>
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-[2px]">
+      <div
+        className="flex h-dvh w-full animate-in slide-in-from-right-3 fill-mode-both flex-col bg-background shadow-2xl sm:h-[calc(100dvh-2rem)] sm:max-h-[min(46rem,calc(100dvh-2rem))] sm:w-[26rem] sm:rounded-3xl sm:border sm:border-border sm:m-4"
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3.5">
+          <div className="relative">
+            <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+              <AvatarFallback className="bg-primary/10 text-primary">💬</AvatarFallback>
+            </Avatar>
+            <span
+              className={cn(
+                "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background",
+                presence.partnerOnline ? "bg-emerald-500" : "bg-muted-foreground/40",
+              )}
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-serif text-base font-semibold leading-tight">Chat berdua</h2>
+            <p className={cn("truncate text-xs", presence.partnerOnline ? "text-emerald-600" : "text-muted-foreground")}>
+              {presence.partnerOnline ? "Online sekarang" : "Offline"}
+            </p>
+          </div>
           <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Tutup chat">
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+        {/* Messages */}
+        <div
+          ref={scrollRef}
+          className="flex-1 space-y-1 overflow-y-auto bg-gradient-to-b from-secondary/20 to-transparent px-4 py-4"
+        >
           {messageLoading && messages.length === 0 ? (
-            <Loader2 className="mx-auto mt-8 h-5 w-5 animate-spin text-primary" />
+            <div className="space-y-3 py-4">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className={cn("flex", i % 2 === 1 ? "justify-end" : "justify-start")}
+                >
+                  <div className="h-10 w-40 animate-pulse rounded-2xl bg-muted" />
+                </div>
+              ))}
+            </div>
           ) : messages.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Belum ada pesan. Mulai ngobrol bareng!
-            </p>
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                <MessageCircleHeart className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <p className="font-serif text-base">Mulai ngobrol, berdua.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Kirim hal-hal kecil yang bikin kalian tersenyum.
+                </p>
+              </div>
+            </div>
           ) : (
             messages.map((m) => {
-              const mine = m.senderId === profile?.id;
+              const mine = m.senderId === myId;
+              const dayKey = new Date(m.createdAt).toDateString();
+              const timeLabel = new Date(m.createdAt).toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+              const showDay = dayKey !== lastDayKey;
+              lastDayKey = dayKey;
+
               return (
-                <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-                  <div
-                    className={cn(
-                      "max-w-[80%] rounded-2xl px-3 py-2 text-sm",
-                      mine
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground",
+                <div key={m.id}>
+                  {showDay && <DayDivider dateKey={dayKey} />}
+                  <div className={cn("flex items-end gap-2", mine ? "justify-end" : "justify-start")}>
+                    {!mine && (
+                      <Avatar className="mb-0.5 h-7 w-7 shrink-0 bg-secondary">
+                        <AvatarFallback className="text-[10px]">
+                          {initials(m.sender?.fullName || "P")}
+                        </AvatarFallback>
+                      </Avatar>
                     )}
-                  >
-                    <p className="whitespace-pre-line">{m.content}</p>
-                    <p className={cn("mt-1 text-[10px]", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                      {mine
-                        ? "kamu"
-                        : m.sender?.nickname || m.sender?.fullName?.split(" ")[0] || "pasanganmu"}
-                    </p>
+                    <div
+                      className={cn(
+                        "relative max-w-[75%] px-3.5 py-2 text-sm leading-relaxed shadow-sm",
+                        mine
+                          ? "rounded-2xl rounded-br-md bg-gradient-to-br from-primary to-primary/90 text-primary-foreground"
+                          : "rounded-2xl rounded-bl-md border border-border/70 bg-card text-foreground",
+                      )}
+                    >
+                      <p className="whitespace-pre-line break-words">{m.content}</p>
+                      <p
+                        className={cn(
+                          "mt-0.5 flex items-center justify-end gap-1 text-[10px]",
+                          mine ? "text-primary-foreground/70" : "text-muted-foreground",
+                        )}
+                      >
+                        {timeLabel}
+                      </p>
+                    </div>
                   </div>
                 </div>
               );
@@ -181,26 +260,68 @@ export function ChatDrawer({
           )}
         </div>
 
-        <form
-          className="flex items-center gap-2 border-t border-border p-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void submit();
-          }}
-        >
-          <Input
-            ref={inputRef}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="Tulis pesan..."
-            className="flex-1"
-            maxLength={2000}
-          />
-          <Button type="submit" size="icon" disabled={sending || !draft.trim()}>
-            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </Button>
-        </form>
+        {/* Composer */}
+        <div className="border-t border-border/70 bg-background p-3">
+          <div
+            className={cn(
+              "flex items-end gap-2 rounded-3xl border border-border/80 bg-card p-1.5 pl-4 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20",
+              sending && "opacity-70",
+            )}
+          >
+            <textarea
+              ref={inputRef}
+              value={draft}
+              onChange={(e) => {
+                setDraft(e.target.value.slice(0, 2000));
+                resizeInput();
+              }}
+              onKeyDown={onKeyDown}
+              rows={1}
+              placeholder="Tulis pesan..."
+              className="max-h-[120px] flex-1 resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+            <Button
+              type="button"
+              size="icon"
+              onClick={() => void submit()}
+              disabled={!draft.trim() || sending}
+              className="h-9 w-9 shrink-0 rounded-full"
+              aria-label="Kirim pesan"
+            >
+              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            </Button>
+          </div>
+          <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
+            Enter untuk kirim · Shift + Enter untuk baris baru
+          </p>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function DayDivider({ dateKey }: { dateKey: string }) {
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  let label: string;
+  if (dateKey === today.toDateString()) label = "Hari ini";
+  else if (dateKey === yesterday.toDateString()) label = "Kemarin";
+  else {
+    label = new Date(dateKey).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+    });
+  }
+
+  return (
+    <div className="my-3 flex items-center gap-3">
+      <span className="h-px flex-1 bg-border/60" />
+      <span className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <span className="h-px flex-1 bg-border/60" />
     </div>
   );
 }
