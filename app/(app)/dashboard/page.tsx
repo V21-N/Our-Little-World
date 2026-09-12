@@ -136,7 +136,11 @@ export default function DashboardPage() {
   })();
 
   const myName = profile?.nickname ?? profile?.fullName.split(" ")[0] ?? "kamu";
-  const coupleName = couple.coupleName || `${profile.fullName.split(" ")[0]} & Pasanganmu`;
+  const partnerName =
+    couple.partner?.nickname ??
+    couple.partner?.fullName?.split(" ")[0] ??
+    "Pasanganmu";
+  const coupleName = couple.coupleName || `${profile.fullName.split(" ")[0]} & ${partnerName}`;
 
   if (loading) {
     return (
@@ -278,8 +282,9 @@ export default function DashboardPage() {
                 </span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <Avatar className="h-10 w-10 opacity-60">
-                  <AvatarFallback>{initials("Pasangan")}</AvatarFallback>
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={couple.partner?.avatarUrl || undefined} />
+                  <AvatarFallback>{initials(couple.partner?.fullName ?? "Pasangan")}</AvatarFallback>
                 </Avatar>
                 <span className="text-xl">
                   {data?.todayMoodPartner ? moodEmoji(data.todayMoodPartner.mood) : "-"}

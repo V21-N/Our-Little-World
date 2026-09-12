@@ -193,10 +193,15 @@ export default function MoodPage() {
           <Card className="border-border/60 bg-secondary/30">
             <CardContent className="flex items-center gap-3 pt-6">
               <Avatar className="h-10 w-10">
-                <AvatarFallback>{initials("Pasangan")}</AvatarFallback>
+                <AvatarImage src={couple?.partner?.avatarUrl || undefined} />
+                <AvatarFallback>{initials(couple?.partner?.fullName ?? "Pasangan")}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="font-medium">Pasanganmu</p>
+                <p className="font-medium">
+                  {couple?.partner?.nickname ||
+                    couple?.partner?.fullName?.split(" ")[0] ||
+                    "Pasanganmu"}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {partnerToday
                     ? `Mood hari ini: ${partnerToday.mood}`

@@ -18,6 +18,7 @@ export interface CurrentCouple {
   theme: string;
   inviteCode: string;
   createdAt?: string;
+  partner: CurrentProfile | null;
 }
 
 export interface CurrentProfile {

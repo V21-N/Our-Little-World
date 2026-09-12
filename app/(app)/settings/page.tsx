@@ -416,18 +416,28 @@ export default function SettingsPage() {
               <p className="text-[11px] font-semibold uppercase tracking-widest text-foreground/60">
                 Partner Kamu
               </p>
-              <div className="mt-3 flex items-center gap-4 rounded-2xl border border-border bg-muted/50 p-4">
+<div className="mt-3 flex items-center gap-4 rounded-2xl border border-border bg-muted/50 p-4">
                 <Avatar className="h-12 w-12 bg-primary/10 text-primary">
-                  <AvatarFallback className="font-serif font-semibold">{initials("Pasangan")}</AvatarFallback>
+                  <AvatarImage src={couple.partner?.avatarUrl || undefined} alt={couple.partner?.fullName ?? "Pasangan"} className="object-cover" />
+                  <AvatarFallback className="font-serif font-semibold">
+                    {initials(couple.partner?.fullName ?? "Pasangan")}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="font-medium text-foreground">Pasanganmu</p>
-                  <p className="text-xs text-foreground/60 mt-0.5">
+                  <p className="font-medium text-foreground">
+                    {couple.partner?.nickname ||
+                      couple.partner?.fullName?.split(" ")[0] ||
+                      "Pasanganmu"}
+                  </p>
+                  <p className="text-xs text-primary/70 mt-0.5">
+                    {couple.partner?.fullName ?? ""}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Bergabung sejak{" "}
                     {couple.createdAt ? formatDate(couple.createdAt, { day: "numeric", month: "long", year: "numeric" }) : "-"}
                   </p>
                 </div>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-none shadow-none">Aktif</Badge>
+<Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-none shadow-none">Aktif</Badge>
               </div>
             </div>
 

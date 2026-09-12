@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn, initials } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { useCoupleActivity } from "@/lib/hooks/use-couple-activities";
@@ -240,6 +240,7 @@ export function ChatDrawer({
                   <div className={cn("flex items-end gap-2", mine ? "justify-end" : "justify-start")}>
                     {!mine && (
                       <Avatar className="mb-0.5 h-7 w-7 shrink-0 bg-secondary">
+                        <AvatarImage src={m.sender?.avatarUrl || undefined} alt={m.sender?.fullName || "Pasangan"} className="object-cover" />
                         <AvatarFallback className="text-[10px]">
                           {initials(m.sender?.fullName || "P")}
                         </AvatarFallback>
