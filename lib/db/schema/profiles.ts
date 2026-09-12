@@ -9,6 +9,7 @@ export const profiles = pgTable("profiles", {
   nickname: text("nickname"),
   birthday: date("birthday"),
   avatarUrl: text("avatar_url"),
+  notificationsSeenAt: timestamp("notifications_seen_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

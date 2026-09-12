@@ -23,7 +23,7 @@ interface SearchResults {
 export function MobileHeader() {
   const pathname = usePathname();
   const { profile, user } = useAuth();
-  const { summary } = useNotifications();
+  const { summary, markSeen } = useNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -153,7 +153,10 @@ export function MobileHeader() {
           open={notificationsOpen}
           onOpenChange={(open) => {
             setNotificationsOpen(open);
-            if (open) void loadNotifications();
+            if (open) {
+              void loadNotifications();
+              markSeen();
+            }
           }}
         >
           <PopoverTrigger asChild>

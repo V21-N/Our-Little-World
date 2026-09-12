@@ -18,6 +18,16 @@ export function useNotifications(intervalMs = 15000) {
   const [tick, setTick] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const markSeen = useCallback(async () => {
+    try {
+      await fetch(`/api/notifications/summary`, { method: "POST" });
+    } catch {
+      // swallow
+    }
+    setSummary({ unreadLetters: 0, newAchievements: 0, total: 0 });
+    setTick(Date.now());
+  }, []);
+
   const refresh = useCallback(async () => {
     try {
       setLoading(true);
@@ -51,5 +61,5 @@ export function useNotifications(intervalMs = 15000) {
     };
   }, [refresh, intervalMs]);
 
-  return { summary, loading, refresh, tick };
+  return { summary, loading, refresh, markSeen, tick };
 }

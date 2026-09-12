@@ -48,6 +48,7 @@ type CoupleActivityContextValue = {
   sendMessage: (content: string) => Promise<void>;
   submitRitual: (answer: string) => Promise<void>;
   refreshActivity: () => Promise<void>;
+  markSeen: () => Promise<void>;
 };
 
 const CoupleActivityContext = createContext<CoupleActivityContextValue | null>(null);
@@ -296,6 +297,14 @@ export function CoupleActivityProvider({
     await Promise.all([poll(), loadMessages()]);
   }, [poll, loadMessages]);
 
+  const markSeen = useCallback(async () => {
+    try {
+      await fetch("/api/notifications/summary", { method: "POST" });
+    } catch {
+      // swallow
+    }
+  }, []);
+
   return (
     <CoupleActivityContext.Provider
       value={{
@@ -312,6 +321,7 @@ export function CoupleActivityProvider({
         sendMessage,
         submitRitual,
         refreshActivity,
+        markSeen,
       }}
     >
       {children}

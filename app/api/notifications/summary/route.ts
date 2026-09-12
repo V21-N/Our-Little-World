@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { loveLetters, userAchievements } from "@/lib/db/schema";
+import { loveLetters, userAchievements, profiles } from "@/lib/db/schema";
 import { ok, handleError, requireCoupleMembership } from "@/lib/api/helpers";
 import { eq, and, gt, ne, or, isNull, lte } from "drizzle-orm";
 
@@ -7,7 +7,11 @@ export async function GET(request: Request) {
   try {
     const { couple, userId } = await requireCoupleMembership(request);
     const now = new Date();
-    const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const profile = await db.query.profiles.findFirst({
+      where: eq(profiles.id, userId),
+    });
+    const seenAt = profile?.notificationsSeenAt ?? new Date(0);
 
     const [letters, recentAchievements] = await Promise.all([
       db
@@ -18,6 +22,7 @@ export async function GET(request: Request) {
             eq(loveLetters.coupleId, couple.id),
             ne(loveLetters.senderId, userId),
             eq(loveLetters.isRead, false),
+            gt(loveLetters.createdAt, seenAt),
             or(isNull(loveLetters.unlockAt), lte(loveLetters.unlockAt, now)),
           ),
         ),
@@ -27,7 +32,7 @@ export async function GET(request: Request) {
         .where(
           and(
             eq(userAchievements.coupleId, couple.id),
-            gt(userAchievements.unlockedAt, dayAgo),
+            gt(userAchievements.unlockedAt, seenAt),
           ),
         ),
     ]);
@@ -37,6 +42,20 @@ export async function GET(request: Request) {
       newAchievements: recentAchievements.length,
       total: letters.length + recentAchievements.length,
     });
+  } catch (e) {
+    return handleError(e);
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const { userId } = await requireCoupleMembership(request);
+    await db
+      .update(profiles)
+      .set({ notificationsSeenAt: new Date(), updatedAt: new Date() })
+      .where(eq(profiles.id, userId));
+
+    return ok({ ok: true });
   } catch (e) {
     return handleError(e);
   }

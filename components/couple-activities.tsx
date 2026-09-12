@@ -109,7 +109,8 @@ export function ChatDrawer({
   open: boolean;
   onClose: () => void;
 }) {
-  const { messages, messageLoading, sendMessage, loadMessages, presence } = useCoupleActivity();
+  const { messages, messageLoading, sendMessage, loadMessages, presence, markSeen } =
+    useCoupleActivity();
   const { profile } = useAuth();
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
@@ -117,12 +118,20 @@ export function ChatDrawer({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const myId = profile?.id;
 
-  useEffect(() => {
-    if (open) {
-      loadMessages();
-      window.setTimeout(() => inputRef.current?.focus(), 200);
+  const handleOpen = async () => {
+    loadMessages();
+    markSeen();
+    try {
+      await fetch("/api/taps");
+    } catch {
+      // swallow
     }
-  }, [open, loadMessages]);
+    window.setTimeout(() => inputRef.current?.focus(), 200);
+  };
+
+  useEffect(() => {
+    if (open) void handleOpen();
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;

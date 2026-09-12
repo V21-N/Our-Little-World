@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,9 +42,15 @@ function badgeCountFor(href: string, summary: { unreadLetters: number; newAchiev
 export function AppSidebar() {
   const pathname = usePathname();
   const { profile, user } = useAuth();
-  const { summary } = useNotifications();
+  const { summary, markSeen } = useNotifications();
   const displayName = profile?.fullName || user?.name || "User";
   const avatarUrl = profile?.avatarUrl || undefined;
+
+  useEffect(() => {
+    if (pathname === "/letters" || pathname.startsWith("/letters/") || pathname === "/achievements") {
+      markSeen();
+    }
+  }, [pathname, markSeen]);
 
   return (
     <aside className="relative sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
