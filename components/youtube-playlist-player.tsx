@@ -15,6 +15,7 @@ interface YouTubePlayer {
   playVideo: () => void;
   previousVideo: () => void;
   setVolume: (volume: number) => void;
+  stopVideo: () => void;
 }
 
 interface YouTubeNamespace {
@@ -99,6 +100,9 @@ const mountRef = useRef<HTMLDivElement>(null);
   const [expanding, setExpanding] = useState(false);
   const [dragging, setDragging] = useState(false);
   const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number; moved: boolean } | null>(null);
+  const trackRef = useRef<YouTubeTrack | null>(track);
+  trackRef.current = track;
+  const readyRef = useRef(false);
   const playlistId = track ? extractYouTubePlaylistId(track.url) : null;
   const videoId = track ? extractYouTubeVideoId(track.url) : null;
   const supported = Boolean(playlistId || videoId);
@@ -174,19 +178,27 @@ const mountRef = useRef<HTMLDivElement>(null);
     }
   }, [track]);
 
-  useEffect(() => {
-    if (!track || !mountRef.current) return;
-    let cancelled = false;
-    setPlaylistReady(false);
-    if (!playlistId && !videoId) return;
-
-    loadYouTubeApi().then((YT) => {
-      if (cancelled || !mountRef.current) return;
-      try {
-        playerRef.current?.destroy();
-      } catch {
-        // ignore
+  const loadCurrentTrack = (p: YouTubePlayer) => {
+    const t = trackRef.current;
+    if (!t) return;
+    const pid = extractYouTubePlaylistId(t.url);
+    const vid = extractYouTubeVideoId(t.url);
+    if (pid) p.loadPlaylist({ list: pid });
+    else if (vid) p.loadVideoById(vid);
+    p.setVolume(75);
+    window.setTimeout(() => {
+      if (readyRef.current) {
+        p.playVideo();
+        setPlaying(true);
       }
+    }, 250);
+  };
+
+  useEffect(() => {
+    if (!mountRef.current) return;
+    let cancelled = false;
+    loadYouTubeApi().then((YT) => {
+      if (cancelled || !mountRef.current || playerRef.current) return;
       playerRef.current = new YT.Player(mountRef.current, {
         height: "1",
         width: "1",
@@ -194,20 +206,10 @@ const mountRef = useRef<HTMLDivElement>(null);
         events: {
           onReady: ({ target }) => {
             playerRef.current = target;
+            readyRef.current = true;
             setReady(true);
-            setPlaylistReady(Boolean(playlistId));
-            if (playlistId) {
-              target.loadPlaylist({ list: playlistId });
-            }
-            else if (videoId) target.loadVideoById(videoId);
-            target.setVolume(75);
-            // Attempt autoplay, then rely on the Play button if the browser blocks audio.
-            window.setTimeout(() => {
-              if (!cancelled) {
-                target.playVideo();
-                setPlaying(true);
-              }
-            }, 250);
+            setPlaylistReady(Boolean(extractYouTubePlaylistId(trackRef.current?.url ?? "")));
+            loadCurrentTrack(target);
           },
           onStateChange: ({ data }) => {
             if (!window.YT) return;
@@ -224,22 +226,30 @@ const mountRef = useRef<HTMLDivElement>(null);
         },
       });
     });
-
     return () => {
       cancelled = true;
       try {
         playerRef.current?.destroy();
-      } catch {
-        // ignore
-      }
+      } catch {}
       playerRef.current = null;
-      setReady(false);
+      readyRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!track) {
       setPlaylistReady(false);
       setPlaying(false);
-    };
-  }, [track, playlistId, videoId]);
-
-  if (!track) return null;
+      try {
+        playerRef.current?.stopVideo();
+      } catch {}
+      return;
+    }
+    setPlaylistReady(false);
+    const p = playerRef.current;
+    if (!p || !readyRef.current) return;
+    loadCurrentTrack(p);
+  }, [track]);
 
   const togglePlayback = () => {
     if (!ready || !playerRef.current) return;
