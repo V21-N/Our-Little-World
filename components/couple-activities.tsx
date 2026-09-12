@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Heart,
   Loader2,
@@ -164,32 +165,34 @@ export function ChatDrawer({
 
   let lastDayKey = "";
 
-  return (
-    <div className="pointer-events-none fixed inset-0 z-[100] grid place-items-end p-3 sm:place-items-center">
-      <div className="pointer-events-auto flex h-[min(44rem,86dvh)] w-full max-w-lg animate-in fade-in zoom-in-95 fill-mode-both flex-col overflow-hidden rounded-3xl border border-border bg-background shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3.5">
-          <div className="relative">
-            <Avatar className="h-10 w-10 ring-2 ring-primary/20">
-              <AvatarFallback className="bg-primary/10 text-primary">💬</AvatarFallback>
-            </Avatar>
-            <span
-              className={cn(
-                "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background",
-                presence.partnerOnline ? "bg-emerald-500" : "bg-muted-foreground/40",
-              )}
-            />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="font-serif text-base font-semibold leading-tight">Chat berdua</h2>
-            <p className={cn("truncate text-xs", presence.partnerOnline ? "text-emerald-600" : "text-muted-foreground")}>
-              {presence.partnerOnline ? "Online sekarang" : "Offline"}
-            </p>
-          </div>
-          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Tutup chat">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+  return typeof document === "undefined"
+    ? null
+    : createPortal(
+        <div className="pointer-events-none fixed inset-0 z-[9999] grid place-items-end p-3 sm:place-items-center">
+          <div className="pointer-events-auto flex h-[min(44rem,86dvh)] w-full max-w-lg animate-in fade-in zoom-in-95 fill-mode-both flex-col overflow-hidden rounded-3xl border border-border bg-background shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3.5">
+              <div className="relative">
+                <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+                  <AvatarFallback className="bg-primary/10 text-primary">💬</AvatarFallback>
+                </Avatar>
+                <span
+                  className={cn(
+                    "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background",
+                    presence.partnerOnline ? "bg-emerald-500" : "bg-muted-foreground/40",
+                  )}
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-serif text-base font-semibold leading-tight">Chat berdua</h2>
+                <p className={cn("truncate text-xs", presence.partnerOnline ? "text-emerald-600" : "text-muted-foreground")}>
+                  {presence.partnerOnline ? "Online sekarang" : "Offline"}
+                </p>
+              </div>
+              <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Tutup chat">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
         {/* Messages */}
         <div
@@ -302,9 +305,10 @@ export function ChatDrawer({
             Enter untuk kirim · Shift + Enter untuk baris baru
           </p>
         </div>
-      </div>
-    </div>
-  );
+          </div>
+        </div>,
+        document.body,
+      );
 }
 
 function DayDivider({ dateKey }: { dateKey: string }) {
