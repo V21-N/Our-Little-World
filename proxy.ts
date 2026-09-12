@@ -38,7 +38,10 @@ function isAuthOnlyPage(pathname: string) {
 }
 
 function hasSessionCookie(request: NextRequest): boolean {
-  return request.cookies.has("yugma.session_token");
+  return (
+    request.cookies.has("yugma.session_token") ||
+    request.cookies.has("__Secure-yugma.session_token")
+  );
 }
 
 export async function proxy(request: NextRequest) {
