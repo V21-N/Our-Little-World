@@ -124,6 +124,15 @@ export function ChatDrawer({
   }, [open, loadMessages]);
 
   useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, open]);
@@ -156,10 +165,8 @@ export function ChatDrawer({
   let lastDayKey = "";
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end bg-black/40 backdrop-blur-[2px]">
-      <div
-        className="flex h-dvh w-full animate-in slide-in-from-right-3 fill-mode-both flex-col bg-background shadow-2xl sm:h-[calc(100dvh-2rem)] sm:max-h-[min(46rem,calc(100dvh-2rem))] sm:w-[26rem] sm:rounded-3xl sm:border sm:border-border sm:m-4"
-      >
+    <div className="pointer-events-none fixed inset-0 z-[100] grid place-items-end p-3 sm:place-items-center">
+      <div className="pointer-events-auto flex h-[min(44rem,86dvh)] w-full max-w-lg animate-in fade-in zoom-in-95 fill-mode-both flex-col overflow-hidden rounded-3xl border border-border bg-background shadow-2xl">
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3.5">
           <div className="relative">
