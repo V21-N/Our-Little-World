@@ -4,17 +4,31 @@ import { prepareImageUpload } from "@/lib/image-upload";
 
 export type ApiOk<T> = { success: true; data: T };
 export type ApiErr = { success: false; error: string; code?: string };
+export type ApiFetchOptions = RequestInit & { revalidate?: boolean };
+
+const GET_CACHE_TTL = 15_000;
+const cacheStore = new Map<string, { until: number; result: ApiOk<unknown> | ApiErr }>();
 
 export async function apiFetch<T>(
   path: string,
-  options?: RequestInit
+  options?: ApiFetchOptions
 ): Promise<ApiOk<T> | ApiErr> {
+  const method = (options?.method ?? "GET").toUpperCase();
+  const revalidate = (options as ApiFetchOptions | undefined)?.revalidate === true;
+
+  if (method === "GET" && !revalidate) {
+    const hit = cacheStore.get(path);
+    if (hit && hit.until > Date.now()) return hit.result as ApiOk<T>;
+  }
+
+  const { revalidate: _drop, cache: cacheOpt, ...fetchOptions } = options ?? {};
+
   const res = await fetch(path, {
-    cache: "no-store",
-    ...options,
+    cache: method === "GET" && !revalidate ? "default" : "no-store",
+    ...fetchOptions,
     headers: {
       "Content-Type": "application/json",
-      ...(options?.headers ?? {}),
+      ...(fetchOptions.headers ?? {}),
     },
   });
 
@@ -30,7 +44,15 @@ export async function apiFetch<T>(
     return { success: false, error: err.error ?? `Request failed (${res.status})`, code: err.code };
   }
 
-  return { success: true, data: (body as ApiOk<T>).data as T };
+  const result = { success: true, data: (body as ApiOk<T>).data as T } as ApiOk<T> | ApiErr;
+
+  if (method === "GET" && !revalidate) {
+    cacheStore.set(path, { until: Date.now() + GET_CACHE_TTL, result: result as ApiOk<unknown> });
+  } else {
+    cacheStore.clear();
+  }
+
+  return result;
 }
 
 export async function uploadFile(

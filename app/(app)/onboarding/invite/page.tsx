@@ -150,7 +150,13 @@ function InviteContent() {
 export default function InvitePage() {
   return (
     <div className="min-h-screen bg-background px-6 py-10 md:py-16">
-      <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />}>
+      <Suspense
+        fallback={
+          <div className="flex min-h-[50vh] items-center justify-center">
+            <div className="h-8 w-8 animate-pulse rounded-full bg-primary/20" />
+          </div>
+        }
+      >
         <InviteContent />
       </Suspense>
     </div>

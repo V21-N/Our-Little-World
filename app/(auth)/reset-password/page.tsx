@@ -93,7 +93,13 @@ export default function ResetPasswordPage() {
         </p>
       </div>
 
-      <Suspense fallback={<Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />}>
+      <Suspense
+        fallback={
+          <div className="flex justify-center py-12">
+            <div className="h-6 w-6 animate-pulse rounded-full bg-primary/20" />
+          </div>
+        }
+      >
         <ResetPasswordForm />
       </Suspense>
     </div>

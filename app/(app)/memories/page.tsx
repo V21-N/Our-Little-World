@@ -2,12 +2,13 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Star, MapPin, BookHeart, Loader2 } from "lucide-react";
+import { Plus, Star, MapPin, BookHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate } from "@/lib/utils";
 import { useApiData } from "@/lib/hooks/use-api";
+import { apiFetch } from "@/lib/api/client";
 import type { Memory } from "@/lib/types";
 import {
   categoryIcon,
@@ -38,8 +39,7 @@ export default function MemoriesPage() {
 
     setLoading(true);
     setStarted(true);
-    fetch(`/api/memories?${params.toString()}`)
-      .then((r) => r.json())
+    apiFetch<{ items: Memory[] }>(`/api/memories?${params.toString()}`)
       .then((res) => {
         if (res.success) setMemories(res.data.items);
         setLoading(false);
@@ -53,8 +53,21 @@ export default function MemoriesPage() {
 
   if (!started || loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-5xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-2 h-8 w-64 animate-pulse rounded bg-muted" />
+            <div className="mt-1 h-4 w-48 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-28 animate-pulse rounded-xl bg-muted" />
+        </div>
+        <div className="h-10 w-full animate-pulse rounded-xl bg-muted" />
+        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="aspect-square animate-pulse rounded-2xl border border-border/60 bg-card" />
+          ))}
+        </div>
       </div>
     );
   }

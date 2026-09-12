@@ -12,7 +12,6 @@ import {
   Plus,
   Sparkles,
   Star,
-  Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -138,8 +137,28 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-5xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-8 flex flex-col gap-4">
+          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+          <div className="h-10 w-48 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-64 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="mb-8 animate-pulse rounded-3xl border border-primary/15 bg-gradient-to-br from-primary/10 via-accent/20 to-secondary/40 p-5 lg:p-7">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
+          </div>
+          <div className="h-8 w-40 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          ))}
+        </div>
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="h-64 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          <div className="h-64 animate-pulse rounded-2xl border border-border/60 bg-card" />
+        </div>
       </div>
     );
   }

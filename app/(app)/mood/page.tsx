@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { Mood, DailyMood } from "@/lib/types";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { apiFetch } from "@/lib/api/client";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -47,8 +48,7 @@ export default function MoodPage() {
   const [saving, setSaving] = useState(false);
 
   const reload = () => {
-    fetch("/api/mood")
-      .then((r) => r.json())
+    apiFetch<MoodResponse>("/api/mood", { revalidate: true })
       .then((res: any) => {
         if (res.success) {
           setMoods(res.data.history);
@@ -90,25 +90,29 @@ export default function MoodPage() {
       return;
     }
     setSaving(true);
-    const res = await fetch("/api/mood", {
+    const res = await apiFetch("/api/mood", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mood, note: note || undefined }),
     });
-    const json = await res.json();
     setSaving(false);
-    if (json.success) {
+    if (res.success) {
       toast.success("Mood tersimpan untuk hari ini ✨");
       reload();
     } else {
-      toast.error(json.error);
+      toast.error(res.error);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-3xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-6">
+          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+          <div className="mt-2 h-8 w-64 animate-pulse rounded bg-muted" />
+          <div className="mt-1 h-4 w-72 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="mb-6 h-80 animate-pulse rounded-3xl border border-border/60 bg-card" />
+        <div className="h-12 w-full animate-pulse rounded-xl bg-muted" />
       </div>
     );
   }

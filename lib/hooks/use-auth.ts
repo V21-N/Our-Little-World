@@ -53,10 +53,12 @@ function useAuthState(): AuthContextValue {
         const u = sessionRes.data.user as any;
         setUser({ id: u.id, name: u.name, email: u.email });
 
-        const profileRes = await apiFetch<CurrentProfile>("/api/profile");
+        const [profileRes, coupleRes] = await Promise.all([
+          apiFetch<CurrentProfile>("/api/profile"),
+          apiFetch<CurrentCouple | null>("/api/couples/current"),
+        ]);
+        
         if (profileRes.success) setProfile(profileRes.data);
-
-        const coupleRes = await apiFetch<CurrentCouple | null>("/api/couples/current");
         if (coupleRes.success) setCouple(coupleRes.data);
       } else {
         setUser(null);

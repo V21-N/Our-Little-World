@@ -37,52 +37,29 @@ function isAuthOnlyPage(pathname: string) {
   return AUTH_ONLY_PAGES.includes(pathname);
 }
 
+function hasSessionCookie(request: NextRequest): boolean {
+  return request.cookies.has("yugma.session_token");
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const next = search ?? "";
 
-  // Public static pages (landing, privacy, support, join) don't need a session.
-  // Skip the DB-backed getSession() call entirely — the client resolves auth via
-  // useAuth()/api/auth. This removes the TTFB cost from the LCP-critical landing page.
   if (isPublicStatic(pathname)) {
     return NextResponse.next();
   }
 
-  // API routes: only allow public API prefixes without a session.
+  // API route protection remains handled by route handlers
   if (pathname.startsWith("/api")) {
-    if (pathname === "/api/auth" || pathname.startsWith("/api/auth/")) {
-      return NextResponse.next();
-    }
-    if (PUBLIC_API_PREFIXES.some((p) => pathname.startsWith(p))) {
-      return NextResponse.next();
-    }
-    // For everything else under /api, still short-circuit when not protected:
-    // a session is required to authorize, so redirect to login for browsers,
-    // return 401 JSON for others. Keeps behavior but only hits the DB when needed.
-    if (!isProtected(pathname)) {
-      return NextResponse.next();
-    }
+    return NextResponse.next();
   }
 
-  let session: { user?: { id: string } } | null = null;
-  try {
-    const { auth } = await import("@/lib/auth");
-    session = (await auth.api.getSession({ headers: request.headers })) as any;
-  } catch {
-    session = null;
-  }
-
-  const isLoggedIn = Boolean(session?.user);
+  // Use cookie presence as a fast-path gate for protected pages
+  const isLoggedIn = hasSessionCookie(request);
   const protectedPath = isProtected(pathname);
   const authOnly = isAuthOnlyPage(pathname);
 
   if (protectedPath && !isLoggedIn) {
-    if (pathname.startsWith("/api")) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 },
-      );
-    }
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname + next);
     return NextResponse.redirect(loginUrl);
@@ -90,17 +67,6 @@ export async function proxy(request: NextRequest) {
 
   if (isLoggedIn && authOnly) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  if (
-    pathname.startsWith("/api") &&
-    !isLoggedIn &&
-    !PUBLIC_API_PREFIXES.some((p) => pathname.startsWith(p))
-  ) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 },
-    );
   }
 
   return NextResponse.next();

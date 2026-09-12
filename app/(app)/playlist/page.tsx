@@ -18,20 +18,16 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 import { toast } from "sonner";
 import type { PlaylistItem } from "@/lib/types";
-import { isYouTubeUrl } from "@/lib/youtube";
+
+import { apiFetch } from "@/lib/api/client";
 import { useYouTubePlayer } from "@/components/youtube-player-provider";
 
 const extractProvider = (url: string) => {
-  if (url.includes("spotify.com") || url.includes("open.spotify")) return "Spotify";
-  if (url.includes("youtube.com") || url.includes("youtu.be")) return "YouTube";
-  return "Other";
+  return "YouTube";
 };
 
 const extractProviderColor = (url: string) => {
-  const p = extractProvider(url);
-  if (p === "Spotify") return "bg-emerald-100 text-emerald-700";
-  if (p === "YouTube") return "bg-rose-100 text-rose-700";
-  return "bg-secondary text-secondary-foreground";
+  return "bg-rose-100 text-rose-700";
 };
 
 export default function PlaylistPage() {
@@ -41,10 +37,37 @@ export default function PlaylistPage() {
   const [submitting, setSubmitting] = useState(false);
   const { track: activeTrack, setQueue } = useYouTubePlayer();
   const [form, setForm] = useState({ songTitle: "", artist: "", url: "" });
+  const [deleteTarget, setDeleteTarget] = useState<PlaylistItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [meta, setMeta] = useState<{ title: string; artist: string } | null>(null);
+  const [metaTimeout, setMetaTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const fetchMeta = async (url: string) => {
+    if (!url.startsWith("http")) return;
+    try {
+      const res = await apiFetch<{ title: string; artist: string }>(
+        `/api/playlists/meta?url=${encodeURIComponent(url)}`,
+      );
+      if (res.success) {
+        setForm((prev) => ({
+          ...prev,
+          songTitle: prev.songTitle || res.data.title,
+          artist: prev.artist || res.data.artist,
+        }));
+      }
+    } catch {
+      // Ingore error, user can type manually
+    }
+  };
+
+  const onUrlChange = (url: string) => {
+    setForm({ ...form, url });
+    if (metaTimeout) clearTimeout(metaTimeout);
+    setMetaTimeout(setTimeout(() => fetchMeta(url), 800));
+  };
 
   const reload = () => {
-    fetch("/api/playlists")
-      .then((r) => r.json())
+    apiFetch<PlaylistItem[]>("/api/playlists")
       .then((res) => {
         if (res.success) setPlaylist(res.data);
         setLoading(false);
@@ -59,50 +82,60 @@ export default function PlaylistPage() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const res = await fetch("/api/playlists", {
+    const res = await apiFetch("/api/playlists", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         songTitle: form.songTitle,
         artist: form.artist || undefined,
         url: form.url,
       }),
     });
-    const json = await res.json();
     setSubmitting(false);
-    if (json.success) {
+    if (res.success) {
       toast.success("Lagu ditambahkan");
       setOpenAdd(false);
       setForm({ songTitle: "", artist: "", url: "" });
       reload();
     } else {
-      toast.error(json.error);
+      toast.error(res.error);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const res = await fetch(`/api/playlists/${id}`, { method: "DELETE" });
-    const json = await res.json();
-    if (json.success) {
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const res = await apiFetch(`/api/playlists/${deleteTarget.id}`, { method: "DELETE" });
+    setDeleting(false);
+    setDeleteTarget(null);
+    if (res.success) {
       toast.success("Lagu dihapus");
       reload();
     } else {
-      toast.error(json.error);
+      toast.error(res.error);
     }
   };
 
-  const youtubeTracks = playlist
-    .filter((item) => isYouTubeUrl(item.url))
-    .map((item) => ({
-      title: item.songTitle,
-      artist: item.artist ?? undefined,
-      url: item.url,
-    }));
+const youtubeTracks = playlist
+     .map((item) => ({
+       title: item.songTitle,
+       artist: item.artist ?? undefined,
+       url: item.url,
+     }));
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-3xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-2 h-8 w-48 animate-pulse rounded bg-muted" />
+            <div className="mt-1 h-4 w-40 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-32 animate-pulse rounded-xl bg-muted" />
+        </div>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="mb-3 h-16 animate-pulse rounded-2xl border border-border/60 bg-card" />
+        ))}
       </div>
     );
   }
@@ -151,16 +184,16 @@ export default function PlaylistPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>URL (Spotify / YouTube)</Label>
+                <Label>URL (YouTube)</Label>
                 <Input
                   required
                   type="url"
-                  placeholder="https://open.spotify.com/track/..."
+                  placeholder="https://youtube.com/watch?v=..."
                   value={form.url}
-                  onChange={(e) => setForm({ ...form, url: e.target.value })}
+                  onChange={(e) => onUrlChange(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Hanya URL dari spotify.com atau youtube.com
+                  Hanya URL dari youtube.com
                 </p>
               </div>
               <DialogFooter>
@@ -208,20 +241,18 @@ export default function PlaylistPage() {
                     <Badge className={`hidden sm:inline-flex ${extractProviderColor(item.url)}`}>
                       {extractProvider(item.url)}
                     </Badge>
-                    <div className="flex items-center gap-1">
-                      {isYouTubeUrl(item.url) && (
-                        <Button
-                          variant={activeTrack?.url === item.url ? "default" : "ghost"}
-                          size="icon-sm"
-                          aria-label={`Putar ${item.songTitle}`}
-                          onClick={() => {
-                            const index = youtubeTracks.findIndex((track) => track.url === item.url);
-                            setQueue(youtubeTracks, index);
-                          }}
-                        >
-                          <Play className="h-4 w-4" fill="currentColor" />
-                        </Button>
-                      )}
+<div className="flex items-center gap-1">
+                       <Button
+                         variant={activeTrack?.url === item.url ? "default" : "ghost"}
+                         size="icon-sm"
+                         aria-label={`Putar ${item.songTitle}`}
+                         onClick={() => {
+                           const index = youtubeTracks.findIndex((track) => track.url === item.url);
+                           setQueue(youtubeTracks, index);
+                         }}
+                       >
+                         <Play className="h-4 w-4" fill="currentColor" />
+                       </Button>
                       <Button variant="ghost" size="icon-sm" asChild>
                         <a href={item.url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-4 w-4" />
@@ -231,7 +262,7 @@ export default function PlaylistPage() {
                         variant="ghost"
                         size="icon-sm"
                         aria-label="Hapus"
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() => setDeleteTarget(item)}
                       >
                         <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
                       </Button>
@@ -243,6 +274,31 @@ export default function PlaylistPage() {
           </ul>
         </>
       )}
+
+      <Dialog
+        open={deleteTarget !== null}
+        onOpenChange={(v) => {
+          if (!v) setDeleteTarget(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hapus lagu?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Yakin ingin menghapus <span className="font-medium text-foreground">"{deleteTarget?.songTitle}"</span> dari playlist? Tindakan ini tidak bisa dibatalkan.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>
+              Batal
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
+              {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
+              Hapus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

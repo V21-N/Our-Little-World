@@ -99,8 +99,14 @@ export default function SettingsPage() {
 
   if (!user || !profile) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#6B2D39]" />
+      <div className="mx-auto max-w-4xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-8 h-8 w-48 animate-pulse rounded bg-muted" />
+        <div className="mb-6 h-40 animate-pulse rounded-3xl border border-border/60 bg-card" />
+        <div className="space-y-4">
+          <div className="h-24 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          <div className="h-24 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          <div className="h-24 animate-pulse rounded-2xl border border-border/60 bg-card" />
+        </div>
       </div>
     );
   }
