@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { initials } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { useNotifications } from "@/lib/hooks/use-notifications";
+import { TapButton, ChatButton } from "@/components/couple-activities";
 import { allNav } from "@/lib/nav";
 import type { Achievement, LoveLetter, Memory } from "@/lib/types";
 
@@ -98,6 +99,8 @@ export function MobileHeader() {
         <span className="font-serif text-base font-semibold">{title}</span>
       </Link>
       <div className="flex items-center gap-2">
+        <TapButton />
+        <ChatButton />
         <Popover open={searchOpen} onOpenChange={setSearchOpen}>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon-sm" aria-label="Search">

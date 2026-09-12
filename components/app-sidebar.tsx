@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { initials } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { useNotifications } from "@/lib/hooks/use-notifications";
+import { PresenceChip, TapButton, ChatButton } from "@/components/couple-activities";
 import { primaryNav, secondaryNav } from "@/lib/nav";
 import { usePathname } from "next/navigation";
 
@@ -148,15 +149,17 @@ export function AppSidebar() {
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{displayName}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              dengan sayang
-            </p>
+            <PresenceChip compact />
           </div>
           <Heart
             className="h-3.5 w-3.5 text-primary heartbeat"
             fill="currentColor"
           />
         </Link>
+        <div className="mt-2 flex items-center justify-end gap-1">
+          <TapButton withLabel />
+          <ChatButton />
+        </div>
       </div>
     </aside>
   );

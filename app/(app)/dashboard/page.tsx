@@ -22,6 +22,7 @@ import { ROMANTIC_MESSAGES } from "@/lib/constants";
 import { cn, formatDate, initials, timeAgo } from "@/lib/utils";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { useNotifications } from "@/lib/hooks/use-notifications";
+import { DailyRitual } from "@/components/daily-ritual";
 import { apiFetch } from "@/lib/api/client";
 import type { Memory, LoveLetter, TimelineEvent, DailyMood, Achievement } from "@/lib/types";
 
@@ -209,6 +210,8 @@ export default function DashboardPage() {
         </div>
         <RelationshipCounter startDate={couple.relationshipStartDate} />
       </section>
+
+      <DailyRitual />
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="md:col-span-1">

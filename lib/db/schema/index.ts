@@ -1,4 +1,5 @@
 export * from "./auth";
+export * from "./couple-activity";
 export * from "./profiles";
 export * from "./couples";
 export * from "./memories";
