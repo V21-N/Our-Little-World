@@ -1,12 +1,13 @@
 import { db } from "@/lib/db";
 import { loveLetters, userAchievements } from "@/lib/db/schema";
 import { ok, handleError, requireCoupleMembership } from "@/lib/api/helpers";
-import { eq, and, gt, ne, sql } from "drizzle-orm";
+import { eq, and, gt, ne, or, isNull, lte } from "drizzle-orm";
 
 export async function GET(request: Request) {
   try {
     const { couple, userId } = await requireCoupleMembership(request);
     const now = new Date();
+    const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const [letters, recentAchievements] = await Promise.all([
       db
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
             eq(loveLetters.coupleId, couple.id),
             ne(loveLetters.senderId, userId),
             eq(loveLetters.isRead, false),
-            sql`(${loveLetters.unlockAt} IS NULL OR ${loveLetters.unlockAt} <= ${now})`,
+            or(isNull(loveLetters.unlockAt), lte(loveLetters.unlockAt, now)),
           ),
         ),
       db
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
         .where(
           and(
             eq(userAchievements.coupleId, couple.id),
-            gt(userAchievements.unlockedAt, sql`${now} - interval '24 hours'`),
+            gt(userAchievements.unlockedAt, dayAgo),
           ),
         ),
     ]);
