@@ -44,8 +44,18 @@ export default function FuturePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-3xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-6">
+          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+          <div className="mt-2 h-8 w-56 animate-pulse rounded bg-muted" />
+          <div className="mt-1 h-4 w-64 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="h-64 animate-pulse rounded-3xl border border-border/60 bg-card" />
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-24 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          ))}
+        </div>
       </div>
     );
   }

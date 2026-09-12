@@ -11,9 +11,12 @@ const configuredSiteURL = (
 )?.replace(/\/$/, "");
 const vercelURL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
 const authBaseURL =
-  (vercelURL && configuredSiteURL?.startsWith("http://localhost")
+  process.env.BETTER_AUTH_URL ||
+  (vercelURL
     ? vercelURL
-    : configuredSiteURL || vercelURL || "http://localhost:3000");
+    : process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : configuredSiteURL || "http://localhost:3000");
 
 const trustedOrigins = [
   authBaseURL,

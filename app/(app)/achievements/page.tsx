@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/utils";
+import { apiFetch } from "@/lib/api/client";
 
 interface AchievementDTO {
   id: string;
@@ -31,8 +32,7 @@ export default function AchievementsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/achievements")
-      .then((r) => r.json())
+    apiFetch<{ all: AchievementDTO[] }>("/api/achievements")
       .then((res) => {
         if (res.success) setAchievements(res.data.all);
         setLoading(false);
@@ -41,8 +41,21 @@ export default function AchievementsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-4xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-2 h-8 w-56 animate-pulse rounded bg-muted" />
+            <div className="mt-1 h-4 w-52 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-28 animate-pulse rounded-xl bg-muted" />
+        </div>
+        <div className="mb-6 h-24 animate-pulse rounded-3xl border border-border/60 bg-card" />
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-36 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          ))}
+        </div>
       </div>
     );
   }

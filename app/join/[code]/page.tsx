@@ -124,7 +124,10 @@ export default function JoinByInvitePage({
   if (checking) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-pulse rounded-full bg-primary/20" />
+          <div className="h-3 w-40 animate-pulse rounded bg-muted" />
+        </div>
       </div>
     );
   }

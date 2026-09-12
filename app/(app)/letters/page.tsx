@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, timeAgo } from "@/lib/utils";
 import { OPEN_WHEN_TAGS } from "@/lib/constants";
+import { apiFetch } from "@/lib/api/client";
 import type { LoveLetter } from "@/lib/types";
 
 interface LetterDTO extends LoveLetter {
@@ -21,8 +22,7 @@ export default function LettersPage() {
   const [filter, setFilter] = useState<"all" | "unlocked" | "locked">("all");
 
   useEffect(() => {
-    fetch("/api/letters")
-      .then((r) => r.json())
+    apiFetch<LetterDTO[]>("/api/letters")
       .then((res) => {
         if (res.success) setLetters(res.data);
         setLoading(false);
@@ -32,8 +32,25 @@ export default function LettersPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-4xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-2 h-8 w-56 animate-pulse rounded bg-muted" />
+            <div className="mt-1 h-4 w-52 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-28 animate-pulse rounded-xl bg-muted" />
+        </div>
+        <div className="mb-6 flex gap-2">
+          <div className="h-8 w-16 animate-pulse rounded-full bg-muted" />
+          <div className="h-8 w-16 animate-pulse rounded-full bg-muted" />
+          <div className="h-8 w-20 animate-pulse rounded-full bg-muted" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-48 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          ))}
+        </div>
       </div>
     );
   }

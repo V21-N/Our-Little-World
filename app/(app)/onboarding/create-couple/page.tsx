@@ -72,7 +72,10 @@ export default function CreateCouplePage() {
   if (bootLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <div className="relative">
+          <div className="absolute inset-0 animate-pulse rounded-full bg-primary/20 blur-sm"></div>
+          <div className="relative h-10 w-10 animate-pulse rounded-full bg-primary/30" />
+        </div>
       </div>
     );
   }

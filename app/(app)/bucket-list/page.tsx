@@ -7,7 +7,6 @@ import {
   Circle,
   Clock,
   ListChecks,
-  Loader2,
   MoreHorizontal,
   Plus,
 } from "lucide-react";
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate } from "@/lib/utils";
+import { apiFetch } from "@/lib/api/client";
 import type { BucketItem, BucketStatus } from "@/lib/types";
 import { CATEGORIES } from "@/lib/constants";
 import { toast } from "sonner";
@@ -40,8 +40,7 @@ export default function BucketListPage() {
   const [filter, setFilter] = useState<BucketStatus | "all">("all");
 
   const reload = () => {
-    fetch("/api/bucket-list")
-      .then((r) => r.json())
+    apiFetch<BucketListResponse>("/api/bucket-list", { revalidate: true })
       .then((res) => {
         if (res.success) setData(res.data);
         setLoading(false);
@@ -54,35 +53,50 @@ export default function BucketListPage() {
   }, []);
 
   const updateStatus = async (item: BucketItem, status: BucketStatus) => {
-    const res = await fetch(`/api/bucket-list/${item.id}`, {
+    const res = await apiFetch(`/api/bucket-list/${item.id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
-    const json = await res.json();
-    if (json.success) {
+    if (res.success) {
       toast.success(status === "completed" ? "Impian tercapai! 🎉" : "Status diperbarui");
       reload();
     } else {
-      toast.error(json.error);
+      toast.error(res.error);
     }
   };
 
   const handleDelete = async (item: BucketItem) => {
-    const res = await fetch(`/api/bucket-list/${item.id}`, { method: "DELETE" });
-    const json = await res.json();
-    if (json.success) {
+    const res = await apiFetch(`/api/bucket-list/${item.id}`, { method: "DELETE" });
+    if (res.success) {
       toast.success("Item dihapus");
       reload();
     } else {
-      toast.error(json.error);
+      toast.error(res.error);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-4xl px-5 py-6 lg:py-10 lg:pr-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-2 h-8 w-56 animate-pulse rounded bg-muted" />
+            <div className="mt-1 h-4 w-52 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-28 animate-pulse rounded-xl bg-muted" />
+        </div>
+        <div className="mb-6 animate-pulse rounded-3xl border border-border/60 bg-card h-20" />
+        <div className="mb-4 flex gap-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-8 w-20 animate-pulse rounded-full bg-muted" />
+          ))}
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 animate-pulse rounded-2xl border border-border/60 bg-card" />
+          ))}
+        </div>
       </div>
     );
   }

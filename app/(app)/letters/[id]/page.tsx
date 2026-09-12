@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Lock,
-  Loader2,
   Mail,
   MailOpen,
   Sparkles,
@@ -57,8 +56,12 @@ export default function LetterDetailPage({
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="mx-auto max-w-2xl px-5 py-6 lg:py-10">
+        <div className="mb-4 h-6 w-64 animate-pulse rounded bg-muted" />
+        <div className="mb-2 h-4 w-48 animate-pulse rounded bg-muted" />
+        <div className="mb-2 h-4 w-48 animate-pulse rounded bg-muted" />
+        <div className="mb-2 h-4 w-48 animate-pulse rounded bg-muted" />
+        <div className="h-16 w-full animate-pulse rounded-2xl border border-border/60 bg-card" />
       </div>
     );
   }
