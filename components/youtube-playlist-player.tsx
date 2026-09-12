@@ -166,6 +166,15 @@ const mountRef = useRef<HTMLDivElement>(null);
   };
 
   useEffect(() => {
+    if (!track) {
+      setMinimized(false);
+      setExpanding(false);
+      setMiniFrom(null);
+      return;
+    }
+  }, [track]);
+
+  useEffect(() => {
     if (!track || !mountRef.current) return;
     let cancelled = false;
     setPlaylistReady(false);
@@ -173,7 +182,11 @@ const mountRef = useRef<HTMLDivElement>(null);
 
     loadYouTubeApi().then((YT) => {
       if (cancelled || !mountRef.current) return;
-      playerRef.current?.destroy();
+      try {
+        playerRef.current?.destroy();
+      } catch {
+        // ignore
+      }
       playerRef.current = new YT.Player(mountRef.current, {
         height: "1",
         width: "1",
@@ -214,7 +227,11 @@ const mountRef = useRef<HTMLDivElement>(null);
 
     return () => {
       cancelled = true;
-      playerRef.current?.destroy();
+      try {
+        playerRef.current?.destroy();
+      } catch {
+        // ignore
+      }
       playerRef.current = null;
       setReady(false);
       setPlaylistReady(false);
