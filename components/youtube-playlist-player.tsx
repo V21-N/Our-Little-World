@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, Shuffle, SkipBack, SkipForward, Minimize2 } from "lucide-react";
+import { Pause, Play, Shuffle, SkipBack, SkipForward, Minimize2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { extractYouTubePlaylistId, extractYouTubeVideoId } from "@/lib/youtube";
 
@@ -75,6 +75,7 @@ export function YouTubePlaylistPlayer({
   canNavigateNext = false,
   onShuffle,
   canShuffle = false,
+  onClose,
 }: {
   track: YouTubeTrack | null;
   onPrevious?: () => void;
@@ -83,6 +84,7 @@ export function YouTubePlaylistPlayer({
   canNavigateNext?: boolean;
   onShuffle?: () => void;
   canShuffle?: boolean;
+  onClose?: () => void;
 }) {
 const mountRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
@@ -347,6 +349,15 @@ const mountRef = useRef<HTMLDivElement>(null);
               </Button>
               <Button variant="ghost" size="icon-sm" onClick={() => moveTrack("next")} disabled={!canNavigateNext && !canNavigateInternal} aria-label="Next">
                 <SkipForward className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={onClose}
+                aria-label="Keluar dari lagu"
+                title="Keluar dari lagu"
+              >
+                <X className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"

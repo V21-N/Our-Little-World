@@ -68,6 +68,11 @@ export function YouTubePlayerProvider({ children }: { children: React.ReactNode 
         canNavigateNext={queueIndex >= 0 && queueIndex < queue.length - 1}
         onShuffle={shuffleQueue}
         canShuffle={queue.length > 1}
+        onClose={() => {
+          setTrack(null);
+          setQueue([]);
+          setQueueIndex(-1);
+        }}
       />
     </YouTubePlayerContext.Provider>
   );
