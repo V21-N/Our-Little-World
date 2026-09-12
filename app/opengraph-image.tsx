@@ -1,12 +1,18 @@
 import { ImageResponse } from "next/og";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 export const alt = "Yugma — ruang privat pasangan";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "https://our-little-world-blond.vercel.app";
+let iconSrc = "";
+try {
+  const iconBase64 = readFileSync(join(process.cwd(), "public", "Yugma-Icon.svg")).toString("base64");
+  iconSrc = `data:image/svg+xml;base64,${iconBase64}`;
+} catch {
+  iconSrc = "";
+}
 
 async function loadGoogleFont(font: string, weight: string) {
   try {
@@ -15,9 +21,10 @@ async function loadGoogleFont(font: string, weight: string) {
       { next: { revalidate: 86400 } },
     ).then((res) => res.text());
 
-    const resource = css.match(/src: url\((.+?)\) format\('woff2'\)/);
+    const resource = css.match(/src:\s*url\(([^)]+)\)/);
     if (!resource?.[1]) return null;
-    return fetch(resource[1]).then((res) => res.arrayBuffer());
+    const url = resource[1].replace(/["']/g, "");
+    return fetch(url).then((res) => res.arrayBuffer());
   } catch {
     return null;
   }
@@ -25,9 +32,9 @@ async function loadGoogleFont(font: string, weight: string) {
 
 export default async function Image() {
   const playfairItalic = await loadGoogleFont("Playfair+Display", "400");
-  const geistRegular = await loadGoogleFont("Geist", "400");
-  const geistMedium = await loadGoogleFont("Geist", "500");
-  const geistBold = await loadGoogleFont("Geist", "700");
+  const geistRegular = await loadGoogleFont("Inter", "400");
+  const geistMedium = await loadGoogleFont("Inter", "500");
+  const geistBold = await loadGoogleFont("Inter", "700");
 
   const fonts: any[] = [];
   if (playfairItalic) {
@@ -207,7 +214,7 @@ export default async function Image() {
           }}
         >
           <img
-            src={`${baseUrl}/Yugma-Icon.svg`}
+            src={iconSrc}
             alt=""
             width={200}
             height={200}
