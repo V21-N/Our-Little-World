@@ -36,7 +36,7 @@ export interface RitualData {
 
 type CoupleActivityContextValue = {
   presence: PartnerPresence;
-  tapCount: number;
+  unreadCount: number;
   latestTap: TapEvent | null;
   messages: ChatMessage[];
   messageLoading: boolean;
@@ -49,6 +49,7 @@ type CoupleActivityContextValue = {
   submitRitual: (answer: string) => Promise<void>;
   refreshActivity: () => Promise<void>;
   markSeen: () => Promise<void>;
+  setChatOpen: (open: boolean) => void;
 };
 
 const CoupleActivityContext = createContext<CoupleActivityContextValue | null>(null);
@@ -85,7 +86,7 @@ export function CoupleActivityProvider({
     partnerPage: null,
     myOnline: false,
   });
-  const [tapCount, setTapCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [latestTap, setLatestTap] = useState<TapEvent | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messageLoading, setMessageLoading] = useState(false);
@@ -94,6 +95,34 @@ export function CoupleActivityProvider({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const seenIdsRef = useRef(new Set<string>());
   const lastTapIdRef = useRef<string | null>(null);
+  const chatOpenRef = useRef(false);
+  const lastSeenChatRef = useRef(Date.now());
+  const messagesRef = useRef<ChatMessage[]>([]);
+
+  const recomputeUnread = useCallback(() => {
+    if (chatOpenRef.current) {
+      setUnreadCount(0);
+      return;
+    }
+    const cutoff = lastSeenChatRef.current;
+    const n = messagesRef.current.filter(
+      (m) => m.senderId !== myId && new Date(m.createdAt).getTime() > cutoff,
+    ).length;
+    setUnreadCount(n);
+  }, [myId]);
+
+  const setChatOpen = useCallback(
+    (open: boolean) => {
+      chatOpenRef.current = open;
+      if (open) {
+        lastSeenChatRef.current = Date.now();
+        setUnreadCount(0);
+      } else {
+        recomputeUnread();
+      }
+    },
+    [recomputeUnread],
+  );
 
   const sendPresenceBeat = useCallback(async () => {
     if (!coupleId) return;
@@ -114,13 +143,17 @@ export function CoupleActivityProvider({
       setMessageLoading(true);
       const res = await fetch("/api/messages?limit=100");
       const json = await res.json();
-      if (json?.success) setMessages(json.data.items);
+      if (json?.success) {
+        messagesRef.current = json.data.items;
+        setMessages(json.data.items);
+        recomputeUnread();
+      }
     } catch {
       // swallow
     } finally {
       setMessageLoading(false);
     }
-  }, [coupleId]);
+  }, [coupleId, recomputeUnread]);
 
   const poll = useCallback(async () => {
     if (!coupleId) return;
@@ -135,7 +168,6 @@ export function CoupleActivityProvider({
 
     const tapsJson = await tapsRes.json();
     if (tapsJson?.success) {
-      setTapCount(tapsJson.data.count ?? 0);
       const tap = tapsJson.data.latest as TapEvent | null;
       if (tap && tap.id !== lastTapIdRef.current) {
         lastTapIdRef.current = tap.id;
@@ -153,15 +185,18 @@ export function CoupleActivityProvider({
   useEffect(() => {
     sendPresenceBeat();
     poll();
+    loadMessages();
     timerRef.current = setInterval(() => {
       sendPresenceBeat();
       poll();
+      loadMessages();
     }, intervalMs);
 
     const onVisible = () => {
       if (document.visibilityState === "visible") {
         sendPresenceBeat();
         poll();
+        loadMessages();
       }
     };
     document.addEventListener("visibilitychange", onVisible);
@@ -174,7 +209,7 @@ export function CoupleActivityProvider({
       if (timerRef.current) clearInterval(timerRef.current);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [sendPresenceBeat, poll, intervalMs]);
+  }, [sendPresenceBeat, poll, loadMessages, intervalMs]);
 
   // Sync seen-ids whenever messages change (for dedup of realtime events).
   useEffect(() => {
@@ -185,12 +220,13 @@ export function CoupleActivityProvider({
     (msg: ChatMessage) => {
       if (!msg?.id || seenIdsRef.current.has(msg.id)) return;
       seenIdsRef.current.add(msg.id);
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === msg.id)) return prev;
-        return [...prev, msg];
-      });
+      messagesRef.current = [...messagesRef.current, msg];
+      setMessages(messagesRef.current);
+      if (!chatOpenRef.current && msg.senderId !== myId) {
+        setUnreadCount((c) => c + 1);
+      }
     },
-    [],
+    [myId],
   );
 
   // Realtime (Supabase) subscription — instant tap + message delivery.
@@ -301,7 +337,8 @@ export function CoupleActivityProvider({
     try {
       await fetch("/api/notifications/summary", { method: "POST" });
       await fetch("/api/taps");
-      setTapCount(0);
+      setUnreadCount(0);
+      lastSeenChatRef.current = Date.now();
     } catch {
       // swallow
     }
@@ -311,7 +348,7 @@ export function CoupleActivityProvider({
     <CoupleActivityContext.Provider
       value={{
         presence,
-        tapCount,
+        unreadCount,
         latestTap,
         messages,
         messageLoading,
@@ -324,6 +361,7 @@ export function CoupleActivityProvider({
         submitRitual,
         refreshActivity,
         markSeen,
+        setChatOpen,
       }}
     >
       {children}

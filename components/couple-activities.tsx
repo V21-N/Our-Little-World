@@ -79,25 +79,35 @@ export function TapButton({ withLabel = false }: { withLabel?: boolean }) {
 
 export function ChatButton() {
   const [open, setOpen] = useState(false);
-  const { tapCount } = useCoupleActivity();
+  const { unreadCount, setChatOpen } = useCoupleActivity();
+
+  const onOpen = () => {
+    setOpen(true);
+    setChatOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+    setChatOpen(false);
+  };
+
   return (
     <>
       <Button
         variant="ghost"
         size="icon-sm"
-        onClick={() => setOpen(true)}
+        onClick={onOpen}
         className="relative"
         aria-label="Chat berdua"
         title="Chat berdua"
       >
         <MessageCircleHeart className="h-4 w-4" />
-        {tapCount > 0 && (
+        {unreadCount > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-semibold text-primary-foreground">
-            {tapCount > 9 ? "9+" : tapCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </Button>
-      <ChatDrawer open={open} onClose={() => setOpen(false)} />
+      <ChatDrawer open={open} onClose={onClose} />
     </>
   );
 }
