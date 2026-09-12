@@ -121,11 +121,6 @@ export function ChatDrawer({
   const handleOpen = async () => {
     loadMessages();
     markSeen();
-    try {
-      await fetch("/api/taps");
-    } catch {
-      // swallow
-    }
     window.setTimeout(() => inputRef.current?.focus(), 200);
   };
 
