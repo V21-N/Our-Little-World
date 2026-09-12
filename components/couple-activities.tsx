@@ -156,7 +156,7 @@ export function ChatDrawer({
   let lastDayKey = "";
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[100] flex justify-end bg-black/40 backdrop-blur-[2px]">
       <div
         className="flex h-dvh w-full animate-in slide-in-from-right-3 fill-mode-both flex-col bg-background shadow-2xl sm:h-[calc(100dvh-2rem)] sm:max-h-[min(46rem,calc(100dvh-2rem))] sm:w-[26rem] sm:rounded-3xl sm:border sm:border-border sm:m-4"
       >
