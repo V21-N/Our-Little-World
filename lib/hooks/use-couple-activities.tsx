@@ -300,9 +300,8 @@ export function CoupleActivityProvider({
   const markSeen = useCallback(async () => {
     try {
       await fetch("/api/notifications/summary", { method: "POST" });
-      const res = await fetch("/api/taps");
-      const json = await res.json();
-      setTapCount(json?.success ? (json.data.count ?? 0) : 0);
+      await fetch("/api/taps");
+      setTapCount(0);
     } catch {
       // swallow
     }
